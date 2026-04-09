@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="fr" style="background:#050D1A">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Institut de France</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap"></noscript>
+<style>
+:root{
+  --gold:#C9993A;--gold-light:#E8C76A;--gold-pale:#F5E8C0;
+  --ink:#070510;--parchment:#E8F0FA;
+  --s17:#7A4012;--s18:#1A4A8A;--s19:#1A6B50;--s20:#7A2FA0;--s21:#9B1C1C;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--ink);overflow:hidden;height:100%;}
+body{font-family:'Cormorant Garamond',Georgia,serif;color:var(--parchment);}
+
+#app{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);}
+
+header{flex-shrink:0;z-index:100;background:linear-gradient(180deg,#020810 0%,#050D1A 100%);border-bottom:1px solid rgba(201,153,58,0.3);padding:8px 16px 8px;}
+.header-top{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:2px;position:relative;}
+header h1{font-family:'IM Fell English',serif;font-size:22px;letter-spacing:0.04em;background:linear-gradient(135deg,var(--gold-light) 0%,var(--gold) 40%,var(--gold-pale) 70%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.subtitle{text-align:center;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(201,153,58,0.75);margin-bottom:7px;font-style:italic;}
+
+/* Onglets académies */
+.acad-tabs{display:flex;gap:5px;overflow-x:auto;padding-bottom:5px;margin-bottom:7px;scrollbar-width:none;}
+.acad-tabs::-webkit-scrollbar{display:none;}
+.acad-tab{flex-shrink:0;padding:5px 11px;border-radius:20px;font-size:11px;font-family:'Cormorant Garamond',serif;cursor:pointer;border:1px solid;transition:all .18s;user-select:none;-webkit-user-select:none;white-space:nowrap;}
+
+.search-row{display:flex;gap:8px;align-items:center;margin-bottom:7px;}
+.search-wrap{position:relative;flex:1;}
+.search-wrap input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(201,153,58,0.25);border-radius:8px;padding:8px 12px 8px 34px;color:var(--parchment);font-family:'Cormorant Garamond',serif;font-size:15px;outline:none;transition:border-color .2s;}
+.search-wrap input::placeholder{color:rgba(232,240,250,0.55);font-style:italic;}
+.search-wrap input:focus{border-color:var(--gold);}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:rgba(201,153,58,0.75);font-size:14px;pointer-events:none;}
+.btn-quiz{flex-shrink:0;padding:8px 13px;background:rgba(201,153,58,0.14);border:1px solid rgba(201,153,58,0.4);border-radius:8px;color:var(--gold-light);font-family:'Cormorant Garamond',serif;font-size:14px;letter-spacing:0.05em;cursor:pointer;transition:background .2s;white-space:nowrap;}
+.btn-quiz:active{background:rgba(201,153,58,0.28);}
+
+/* Quiz modal */
+.quiz-backdrop{position:fixed;inset:0;background:rgba(2,5,12,0.92);backdrop-filter:blur(6px);z-index:250;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s;}
+.quiz-backdrop.open{opacity:1;pointer-events:all;}
+.quiz-sheet{width:100%;background:linear-gradient(180deg,#0A1520 0%,#060E18 100%);border-top:1px solid rgba(201,153,58,0.3);border-radius:20px 20px 0 0;padding:0 20px calc(var(--safe-bot)+28px);transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:90vh;overflow-y:auto;}
+.quiz-backdrop.open .quiz-sheet{transform:translateY(0);}
+.quiz-handle{width:40px;height:4px;background:rgba(201,153,58,0.45);border-radius:2px;margin:12px auto 18px;}
+.quiz-progress{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(201,153,58,0.75);text-align:center;margin-bottom:6px;}
+.quiz-progress-bar{height:3px;background:rgba(201,153,58,0.15);border-radius:2px;margin-bottom:18px;}
+.quiz-progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s ease;}
+.quiz-portrait{width:90px;height:105px;border-radius:10px;border:1px solid rgba(201,153,58,0.3);overflow:hidden;background:#E8D8B0;position:relative;margin:0 auto 16px;}
+.quiz-portrait img{width:100%;height:100%;object-fit:cover;object-position:top center;opacity:0;transition:opacity .4s;}
+.quiz-portrait img.loaded{opacity:1;}
+.quiz-portrait-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px;}
+.quiz-question{font-family:'IM Fell English',serif;font-size:19px;color:var(--parchment);text-align:center;margin-bottom:20px;line-height:1.4;}
+.quiz-hint{font-size:13px;color:rgba(201,153,58,0.75);text-align:center;font-style:italic;margin-bottom:16px;}
+.quiz-choices{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.quiz-choice{padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(201,153,58,0.22);border-radius:10px;color:var(--parchment);font-family:'Cormorant Garamond',serif;font-size:15px;cursor:pointer;transition:all .18s;text-align:left;}
+.quiz-choice:active{background:rgba(201,153,58,0.12);}
+.quiz-choice.correct{background:rgba(26,107,80,0.25);border-color:#80E0C0;color:#80E0C0;}
+.quiz-choice.wrong{background:rgba(155,28,28,0.25);border-color:#F5A0A0;color:#F5A0A0;}
+.quiz-choice.reveal{background:rgba(26,107,80,0.12);border-color:rgba(80,200,150,0.3);color:rgba(80,200,150,0.7);}
+.quiz-feedback{text-align:center;font-size:14px;font-style:italic;color:rgba(232,240,250,0.8);margin-bottom:16px;min-height:20px;}
+.quiz-next{width:100%;padding:12px;background:rgba(201,153,58,0.14);border:1px solid rgba(201,153,58,0.4);border-radius:10px;color:var(--gold-light);font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:0.1em;cursor:pointer;transition:background .2s;display:none;}
+.quiz-next:active{background:rgba(201,153,58,0.28);}
+.quiz-score{text-align:center;padding:20px 0;}
+.quiz-score-num{font-family:'IM Fell English',serif;font-size:52px;color:var(--gold-light);line-height:1;}
+.quiz-score-label{font-size:14px;color:rgba(201,153,58,0.75);font-style:italic;margin-bottom:20px;}
+.quiz-close-btn{width:100%;padding:12px;background:rgba(201,153,58,0.14);border:1px solid rgba(201,153,58,0.4);border-radius:10px;color:var(--gold-light);font-family:'Cormorant Garamond',serif;font-size:15px;cursor:pointer;}
+
+.siecle-filters{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+.siecle-filters::-webkit-scrollbar{display:none;}
+.pill{flex-shrink:0;padding:4px 11px;border-radius:20px;font-size:11px;letter-spacing:0.08em;font-family:'Cormorant Garamond',serif;cursor:pointer;border:1px solid transparent;transition:all .2s;user-select:none;-webkit-user-select:none;}
+.pill.all{background:rgba(201,153,58,0.12);border-color:rgba(201,153,58,0.35);color:var(--gold-light);}
+.pill.all.active{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:600;}
+.pill[data-siecle="XVIIe siècle"]{background:rgba(122,64,18,0.12);border-color:rgba(122,64,18,0.35);color:#E8B87A;}
+.pill[data-siecle="XVIIe siècle"].active{background:var(--s17);color:#fff;border-color:var(--s17);}
+.pill[data-siecle="XVIIIe siècle"]{background:rgba(26,74,138,0.12);border-color:rgba(26,74,138,0.35);color:#7EB0E3;}
+.pill[data-siecle="XVIIIe siècle"].active{background:var(--s18);color:#fff;border-color:var(--s18);}
+.pill[data-siecle="XIXe siècle"]{background:rgba(26,107,80,0.12);border-color:rgba(26,107,80,0.35);color:#80E0C0;}
+.pill[data-siecle="XIXe siècle"].active{background:var(--s19);color:#fff;border-color:var(--s19);}
+.pill[data-siecle="XXe siècle"]{background:rgba(122,47,160,0.12);border-color:rgba(122,47,160,0.35);color:#D4A0F5;}
+.pill[data-siecle="XXe siècle"].active{background:var(--s20);color:#fff;border-color:var(--s20);}
+.pill[data-siecle="XXIe siècle"]{background:rgba(155,28,28,0.12);border-color:rgba(155,28,28,0.35);color:#F5A0A0;}
+.pill[data-siecle="XXIe siècle"].active{background:var(--s21);color:#fff;border-color:var(--s21);}
+
+.count-bar{flex-shrink:0;padding:7px 16px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(201,153,58,0.85);border-bottom:1px solid rgba(201,153,58,0.15);}
+.acad-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 12px calc(var(--safe-bot)+20px);}
+.siecle-section{margin-bottom:4px;}
+.siecle-header{display:flex;align-items:center;gap:8px;padding:14px 4px 8px;}
+.siecle-line{flex:1;height:1px;background:rgba(201,153,58,0.2);}
+.siecle-label{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(201,153,58,0.85);font-style:italic;}
+
+.acad-card{display:flex;align-items:center;gap:14px;padding:12px 14px;background:#F5EDD8;border:1px solid rgba(180,130,40,0.35);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;animation:fadeUp .35s ease both;}
+.acad-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:3px 0 0 3px;}
+.acad-card[data-siecle="XVIIe siècle"]::before{background:var(--s17);}
+.acad-card[data-siecle="XVIIIe siècle"]::before{background:var(--s18);}
+.acad-card[data-siecle="XIXe siècle"]::before{background:var(--s19);}
+.acad-card[data-siecle="XXe siècle"]::before{background:var(--s20);}
+.acad-card[data-siecle="XXIe siècle"]::before{background:var(--s21);}
+.acad-card:active{transform:scale(0.985);background:#EDE0C4;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.portrait-wrap{width:62px;height:72px;border-radius:8px;border:1px solid rgba(180,130,40,0.3);flex-shrink:0;overflow:hidden;background:#E8D8B0;position:relative;}
+.portrait-wrap img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;opacity:0;transition:opacity .4s;position:relative;z-index:1;}
+.portrait-wrap img.loaded{opacity:1;}
+.portrait-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;z-index:0;}
+.acad-info{flex:1;min-width:0;}
+.acad-num{font-size:10px;letter-spacing:0.15em;color:#8B5E1A;text-transform:uppercase;margin-bottom:2px;}
+.acad-name{font-family:'IM Fell English',serif;font-size:17px;color:#1A0A00;line-height:1.2;margin-bottom:3px;}
+.acad-epithet{font-style:italic;font-size:13px;color:#7A4A0A;margin-bottom:4px;}
+.acad-dates{font-size:12px;color:#3A2A10;}
+.acad-dates span{display:inline-block;background:rgba(201,153,58,0.2);border:1px solid rgba(180,130,40,0.4);border-radius:4px;padding:1px 6px;}
+.acad-arrow{color:rgba(140,100,30,0.7);font-size:14px;flex-shrink:0;}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(2,5,12,0.88);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s;}
+.modal-backdrop.open{opacity:1;pointer-events:all;}
+.modal{width:100%;background:linear-gradient(180deg,#0A1520 0%,#060E18 100%);border-top:1px solid rgba(201,153,58,0.3);border-radius:20px 20px 0 0;padding:0 0 calc(var(--safe-bot)+24px);transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:88vh;overflow-y:auto;}
+.modal-backdrop.open .modal{transform:translateY(0);}
+.modal-handle{width:40px;height:4px;background:rgba(201,153,58,0.45);border-radius:2px;margin:12px auto 0;}
+.modal-portrait-wrap{position:relative;height:220px;overflow:hidden;background:#040A14;}
+.modal-portrait-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,#0A1520);z-index:2;}
+.modal-portrait-wrap img{width:100%;height:100%;object-fit:cover;object-position:top center;opacity:0;transition:opacity .5s;position:relative;z-index:1;}
+.modal-portrait-wrap img.loaded{opacity:0.9;}
+.modal-portrait-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px;opacity:0.35;z-index:0;}
+.spinner{width:28px;height:28px;border:2px solid rgba(201,153,58,0.2);border-top-color:rgba(201,153,58,0.8);border-radius:50%;animation:spin .8s linear infinite;}
+.modal-body{padding:0 20px;position:relative;z-index:2;margin-top:-20px;}
+.modal-siecle-badge{display:inline-block;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:6px;border:1px solid;}
+.modal-acad-badge{display:inline-block;font-size:10px;letter-spacing:0.15em;padding:3px 10px;border-radius:20px;margin-bottom:10px;margin-left:6px;border:1px solid;background:rgba(255,255,255,0.06);color:rgba(232,240,250,0.7);border-color:rgba(255,255,255,0.15);}
+.modal-name{font-family:'IM Fell English',serif;font-size:26px;line-height:1.1;color:#F0F8FF;margin-bottom:4px;}
+.modal-epithet{font-style:italic;font-size:16px;color:var(--gold-light);margin-bottom:14px;}
+.modal-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-box{background:rgba(255,255,255,0.06);border:1px solid rgba(201,153,58,0.22);border-radius:10px;padding:10px 12px;}
+.stat-label{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold-light);margin-bottom:4px;}
+.stat-value{font-size:14px;color:var(--parchment);font-weight:300;}
+.modal-desc{font-size:14px;line-height:1.7;color:rgba(232,240,250,0.88);font-style:italic;border-left:2px solid rgba(201,153,58,0.5);padding-left:14px;margin-bottom:16px;}
+.modal-close{width:100%;padding:12px;background:rgba(201,153,58,0.14);border:1px solid rgba(201,153,58,0.4);border-radius:10px;color:var(--gold-light);font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:0.1em;cursor:pointer;transition:background .2s;}
+.modal-close:active{background:rgba(201,153,58,0.28);}
+.empty{text-align:center;padding:60px 20px;color:rgba(201,153,58,0.55);font-style:italic;font-size:16px;}
+.empty span{font-size:36px;display:block;margin-bottom:12px;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(201,153,58,0.22);border-radius:2px;}
+
+.btn-gear{position:absolute;right:0;width:36px;height:36px;border-radius:50%;background:rgba(201,153,58,0.14);border:1px solid rgba(201,153,58,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;color:rgba(201,153,58,0.9);font-size:18px;-webkit-user-select:none;user-select:none;}
+.btn-gear:active{background:rgba(201,153,58,0.22);transform:rotate(45deg);}
+
+.settings-backdrop{position:fixed;inset:0;background:rgba(2,5,12,0.92);backdrop-filter:blur(6px);z-index:300;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s;}
+.settings-backdrop.open{opacity:1;pointer-events:all;}
+.settings-sheet{width:100%;background:linear-gradient(180deg,#0A1520 0%,#060E18 100%);border-top:1px solid rgba(201,153,58,0.35);border-radius:20px 20px 0 0;padding:0 0 calc(var(--safe-bot)+28px);transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:92vh;overflow-y:auto;}
+.settings-backdrop.open .settings-sheet{transform:translateY(0);}
+.settings-handle{width:40px;height:4px;background:rgba(201,153,58,0.28);border-radius:2px;margin:12px auto 20px;cursor:pointer;}
+.settings-app-id{display:flex;flex-direction:column;align-items:center;padding:0 20px 20px;border-bottom:1px solid rgba(201,153,58,0.1);}
+.settings-app-icon{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#0A1E3A,#050D1A);border:1px solid rgba(201,153,58,0.35);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:10px;box-shadow:0 4px 20px rgba(0,0,0,0.5);}
+.settings-app-name{font-family:'IM Fell English',serif;font-size:18px;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;text-align:center;}
+.settings-version{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(201,153,58,0.75);font-style:italic;}
+.settings-section-title{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(201,153,58,0.85);padding:18px 20px 8px;font-style:italic;}
+.app-row{display:flex;align-items:center;gap:14px;padding:11px 20px;cursor:pointer;transition:background .15s;}
+.app-row:active{background:rgba(255,255,255,0.06);}
+.app-row-icon{width:46px;height:46px;border-radius:11px;flex-shrink:0;border:1px solid rgba(201,153,58,0.28);display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(255,255,255,0.05);}
+.app-row-info{flex:1;min-width:0;}
+.app-row-name{font-family:'IM Fell English',serif;font-size:15px;color:var(--parchment);margin-bottom:2px;}
+.app-row-desc{font-size:12px;color:rgba(232,240,250,0.78);font-style:italic;}
+.app-row-arrow{color:rgba(201,153,58,0.75);font-size:14px;}
+.settings-divider{height:1px;background:rgba(201,153,58,0.14);margin:0 20px;}
+.settings-copyright{margin:20px 20px 0;background:rgba(255,255,255,0.04);border:1px solid rgba(201,153,58,0.15);border-radius:12px;padding:14px 16px;text-align:center;}
+.settings-copyright p{font-size:12px;color:rgba(232,240,250,0.75);line-height:1.7;font-style:italic;}
+.settings-copyright strong{color:rgba(201,153,58,1);font-weight:500;}
+.settings-claude-badge{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:5px 12px;border-radius:20px;background:rgba(100,80,200,0.15);border:1px solid rgba(100,80,200,0.4);font-size:11px;color:rgba(180,160,255,0.88);letter-spacing:0.05em;}
+.settings-close{width:calc(100% - 40px);margin:16px 20px 0;padding:12px;background:rgba(201,153,58,0.1);border:1px solid rgba(201,153,58,0.25);border-radius:10px;color:var(--gold-light);font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:0.1em;cursor:pointer;transition:background .2s;}
+.settings-close:active{background:rgba(201,153,58,0.2);}
+</style>
+</head>
+<body style="background:#050D1A">
+<div id="app">
+<header>
+  <div class="header-top">
+    <h1>Institut de France</h1>
+    <button class="btn-gear" onclick="openSettings()" aria-label="Paramètres">⚙</button>
+  </div>
+  <p class="subtitle" id="acadSubtitle">Cinq académies · 1635 — présent</p>
+  <div class="acad-tabs" id="acadTabs"></div>
+  <div class="search-row">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Rechercher…" autocomplete="off">
+    </div>
+    <button class="btn-quiz" onclick="openQuiz()" aria-label="Quiz">🎓 Quiz</button>
+  </div>
+  <div class="siecle-filters" id="siecleFilters"></div>
+</header>
+
+<div class="count-bar" id="countBar"></div>
+<div class="acad-list" id="acadList"></div>
+</div><!-- #app -->
+
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal(event)">
+  <div class="modal"><div class="modal-handle"></div><div id="modalContent"></div></div>
+</div>
+
+<!-- QUIZ -->
+<div class="quiz-backdrop" id="quizBackdrop">
+  <div class="quiz-sheet">
+    <div class="quiz-handle"></div>
+    <div id="quizContent"></div>
+  </div>
+</div>
+
+<div class="settings-backdrop" id="settingsBackdrop" onclick="closeSettings(event)">
+  <div class="settings-sheet">
+    <div class="settings-handle" onclick="closeSettings()"></div>
+    <div class="settings-app-id">
+      <div class="settings-app-icon">🏛</div>
+      <div class="settings-app-name">Institut de France</div>
+      <div class="settings-version">Version 1.1 &nbsp;·&nbsp; 5 académies · 100 membres</div>
+    </div>
+    <div class="settings-section-title">Nos autres applications</div>
+    <div class="app-row" onclick="openAppStore('id6761424444')"><div class="app-row-icon">🇫🇷</div><div class="app-row-info"><div class="app-row-name">Présidents de la République</div><div class="app-row-desc">De Bonaparte à Macron · 1848–présent</div></div><div class="app-row-arrow">›</div></div>
+    <div class="settings-divider"></div>
+    <div class="app-row" onclick="openAppStore('id6761323546')"><div class="app-row-icon">👑</div><div class="app-row-info"><div class="app-row-name">Rois de France</div><div class="app-row-desc">De Clovis à Louis-Philippe · 481–1848</div></div><div class="app-row-arrow">›</div></div>
+    <div class="settings-divider"></div>
+    <div class="app-row" onclick="openAppStore('id6761334922')"><div class="app-row-icon">🪶</div><div class="app-row-info"><div class="app-row-name">Académie française</div><div class="app-row-desc">Les quarante Immortels</div></div><div class="app-row-arrow">›</div></div>
+    <div class="settings-divider"></div>
+    <div class="app-row" onclick="openAppStore('id6760751055')"><div class="app-row-icon">🪦</div><div class="app-row-info"><div class="app-row-name">Cimetières Paris</div><div class="app-row-desc">Guide des grands cimetières parisiens</div></div><div class="app-row-arrow">›</div></div>
+    <div class="settings-divider"></div>
+    <div class="app-row" onclick="openAppStore('id6760890465')"><div class="app-row-icon">🏛</div><div class="app-row-info"><div class="app-row-name">Musées Paris</div><div class="app-row-desc">Les musées de la capitale</div></div><div class="app-row-arrow">›</div></div>
+    <div class="settings-divider"></div>
+    <div class="app-row" onclick="openAppStore('id6760617965')"><div class="app-row-icon">🍽</div><div class="app-row-info"><div class="app-row-name">MesRestaurants</div><div class="app-row-desc">Vos restaurants favoris</div></div><div class="app-row-arrow">›</div></div>
+    <div class="settings-divider"></div>
+    <div class="app-row" onclick="openAppStore('id6760126279')"><div class="app-row-icon">🍷</div><div class="app-row-info"><div class="app-row-name">Cave Manager</div><div class="app-row-desc">Gérez votre cave à vin</div></div><div class="app-row-arrow">›</div></div>
+    <div class="settings-divider"></div>
+    <div class="app-row" onclick="openAppStore('id6761271324')"><div class="app-row-icon">💊</div><div class="app-row-info"><div class="app-row-name">Medisafe</div><div class="app-row-desc">Suivi de vos médicaments</div></div><div class="app-row-arrow">›</div></div>
+    <div class="settings-copyright">
+      <p><strong>© 2026 Michel Garlandat</strong><br>Tous droits réservés<br>Images : Wikimedia Commons (licence libre)</p>
+      <div class="settings-claude-badge">✦ &nbsp;Conçu avec Claude · Anthropic</div>
+    </div>
+    <button class="settings-close" onclick="closeSettings()">Fermer</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+//  ACADÉMIES META
+// ══════════════════════════════════════
+const ACADEMIES_META = [
+  {id:"francaise",   emoji:"🪶", short:"Française",  name:"Académie française",
+   founded:1635, subtitle:"Les quarante Immortels",
+   color:"#C9993A", bg:"rgba(201,153,58,0.18)", border:"rgba(201,153,58,0.6)"},
+  {id:"inscriptions",emoji:"📜", short:"Lettres",     name:"Académie des Inscriptions et Belles-Lettres",
+   founded:1663, subtitle:"Histoire · Archéologie · Philologie",
+   color:"#7EB0E3", bg:"rgba(26,74,138,0.22)",  border:"rgba(100,160,220,0.6)"},
+  {id:"sciences",    emoji:"🔭", short:"Sciences",    name:"Académie des Sciences",
+   founded:1666, subtitle:"Mathématiques · Physique · Biologie",
+   color:"#80E0C0", bg:"rgba(26,107,80,0.22)",  border:"rgba(80,200,150,0.6)"},
+  {id:"beauxarts",   emoji:"🎨", short:"Beaux-Arts",  name:"Académie des Beaux-Arts",
+   founded:1648, subtitle:"Peinture · Musique · Architecture · Cinéma",
+   color:"#F5A0A0", bg:"rgba(155,28,28,0.22)",  border:"rgba(220,80,80,0.6)"},
+  {id:"morales",     emoji:"⚖️", short:"Sc. morales", name:"Académie des Sciences morales et politiques",
+   founded:1795, subtitle:"Philosophie · Droit · Économie",
+   color:"#D4A0F5", bg:"rgba(122,47,160,0.22)", border:"rgba(180,100,240,0.6)"},
+];
+
+// ══════════════════════════════════════
+//  DONNÉES
+// ══════════════════════════════════════
+const MEMBRES = [
+
+// ─── 🪶 ACADÉMIE FRANÇAISE (40) ───────────────────────────────────
+
+{ac:"francaise",id:1,f:14,name:"Pierre Corneille",ep:"le Grand Corneille",s:"XVIIe siècle",el:1647,dc:1684,v:false,sec:null,
+ wk:"Pierre_Corneille",dom:"Théâtre · Poésie",
+ desc:"Père de la tragédie classique française, son élection à l'Académie consacra une carrière entamée avec la polémique du Cid. Ses grandes pièces — Horace, Cinna, Polyeucte — fondèrent les règles du classicisme et le « dilemme cornélien » entre devoir et passion.",
+ oe:"Le Cid (1637) · Horace (1640) · Cinna (1641) · Polyeucte (1643)"},
+{ac:"francaise",id:2,f:20,name:"Jacques-Bénigne Bossuet",ep:"l'Aigle de Meaux",s:"XVIIe siècle",el:1671,dc:1704,v:false,sec:null,
+ wk:"Jacques-Bénigne_Bossuet",dom:"Oraison · Théologie",
+ desc:"Évêque de Meaux et précepteur du Dauphin, il fut le plus grand orateur sacré du Grand Siècle. Ses Oraisons funèbres sont des monuments absolus de la prose française alliant gravité chrétienne et sublime rhétorique.",
+ oe:"Oraisons funèbres · Discours sur l'histoire universelle (1681) · Politique tirée de l'Écriture sainte"},
+{ac:"francaise",id:3,f:8,name:"Jean Racine",ep:"le Tragique",s:"XVIIe siècle",el:1673,dc:1699,v:false,sec:null,
+ wk:"Jean_Racine",dom:"Théâtre",
+ desc:"Élu à 34 ans grâce au soutien de Louis XIV, il porta la tragédie classique à son sommet absolu. Sa psychologie des passions et son alexandrin ciselé en font le dramaturge le plus joué de la Comédie-Française.",
+ oe:"Andromaque (1667) · Britannicus (1669) · Bérénice (1670) · Phèdre (1677)"},
+{ac:"francaise",id:4,f:29,name:"Jean de La Fontaine",ep:"le Fabuliste",s:"XVIIe siècle",el:1684,dc:1695,v:false,sec:null,
+ wk:"Jean_de_La_Fontaine",dom:"Poésie · Fables",
+ desc:"Son élection fut retardée par Louis XIV, qui lui reprochait sa fidélité à Fouquet. Ses Fables en douze livres mêlent sagesse morale, satire sociale et beauté lyrique. Elles restent parmi les textes français les plus mémorisés.",
+ oe:"Fables (1668–1694) · Contes et nouvelles en vers · Psyché et Cupidon (1669)"},
+{ac:"francaise",id:5,f:1,name:"Nicolas Boileau",ep:"le Législateur du Parnasse",s:"XVIIe siècle",el:1684,dc:1711,v:false,sec:null,
+ wk:"Nicolas_Boileau",dom:"Poésie · Critique littéraire",
+ desc:"Théoricien du classicisme et ami de Molière, La Fontaine et Racine, son Art poétique en vers fixa pour plus d'un siècle les canons de la littérature française. Il fut le grand arbitre du goût littéraire sous Louis XIV.",
+ oe:"L'Art poétique (1674) · Satires · Épîtres · Le Lutrin (1674)"},
+{ac:"francaise",id:6,f:34,name:"François de Fénelon",ep:"le Cygne de Cambrai",s:"XVIIe siècle",el:1693,dc:1715,v:false,sec:null,
+ wk:"Fénelon",dom:"Philosophie · Littérature",
+ desc:"Archevêque de Cambrai et précepteur du duc de Bourgogne, il rédigea Télémaque comme roman d'éducation princière. Son mysticisme quiétiste le brouilla définitivement avec Bossuet et la cour de Versailles.",
+ oe:"Les Aventures de Télémaque (1699) · Dialogues des morts · Traité de l'éducation des filles (1687)"},
+{ac:"francaise",id:7,f:38,name:"Bernard de Fontenelle",ep:"",s:"XVIIe siècle",el:1691,dc:1757,v:false,sec:null,
+ wk:"Bernard_Le_Bouyer_de_Fontenelle",dom:"Sciences · Littérature",
+ desc:"Neveu de Corneille, secrétaire perpétuel de l'Académie des sciences pendant 42 ans. Mort à 99 ans, il incarna la continuité entre le classicisme du Grand Siècle et les Lumières naissantes.",
+ oe:"Entretiens sur la pluralité des mondes (1686) · Histoire des oracles · Éloges des académiciens"},
+{ac:"francaise",id:8,f:6,name:"Montesquieu",ep:"le Philosophe de Bordeaux",s:"XVIIIe siècle",el:1728,dc:1755,v:false,sec:null,
+ wk:"Montesquieu",dom:"Philosophie · Droit",
+ desc:"Président au Parlement de Bordeaux, théoricien de la séparation des pouvoirs, son De l'Esprit des lois influença directement la Constitution américaine de 1787.",
+ oe:"Lettres persanes (1721) · Considérations sur les Romains (1734) · De l'Esprit des lois (1748)"},
+{ac:"francaise",id:9,f:2,name:"Pierre de Marivaux",ep:"",s:"XVIIIe siècle",el:1742,dc:1763,v:false,sec:null,
+ wk:"Marivaux",dom:"Théâtre · Roman",
+ desc:"Inventeur du « marivaudage », exploration délicate des sentiments naissants. Ses comédies psychologiques occupent désormais une place de premier rang au répertoire de la Comédie-Française.",
+ oe:"Le Jeu de l'amour et du hasard (1730) · La Double Inconstance · La Vie de Marianne · L'Île des esclaves"},
+{ac:"francaise",id:10,f:22,name:"Georges-Louis de Buffon",ep:"le Naturaliste",s:"XVIIIe siècle",el:1753,dc:1788,v:false,sec:null,
+ wk:"Georges-Louis_Leclerc_de_Buffon",dom:"Sciences naturelles",
+ desc:"Intendant du Jardin du Roi durant 49 ans, son Histoire naturelle en 44 volumes fut l'un des plus grands succès de librairie du XVIIIe siècle.",
+ oe:"Histoire naturelle (44 vol., 1749–1804) · Discours sur le style (1753) · Les Époques de la nature (1778)"},
+{ac:"francaise",id:11,f:33,name:"Voltaire",ep:"le Patriarche de Ferney",s:"XVIIIe siècle",el:1746,dc:1778,v:false,sec:null,
+ wk:"Voltaire",dom:"Philosophie · Littérature",
+ desc:"Figure centrale des Lumières, sa candidature avait été rejetée deux fois avant son élection. Exilé à Ferney, il mena une guerre philosophique contre l'intolérance. Son retour triomphal à Paris en 1778 rassembla toute la ville avant sa mort.",
+ oe:"Lettres philosophiques (1734) · Zadig (1747) · Candide (1759) · Dictionnaire philosophique (1764)"},
+{ac:"francaise",id:12,f:5,name:"Jean d'Alembert",ep:"",s:"XVIIIe siècle",el:1754,dc:1783,v:false,sec:null,
+ wk:"Jean_Le_Rond_d'Alembert",dom:"Mathématiques · Philosophie",
+ desc:"Mathématicien brillant, co-directeur de l'Encyclopédie avec Diderot, secrétaire perpétuel de l'Académie française en 1772.",
+ oe:"Discours préliminaire de l'Encyclopédie (1751) · Traité de dynamique (1743) · Mélanges de littérature"},
+{ac:"francaise",id:13,f:4,name:"François-René de Chateaubriand",ep:"le Père du Romantisme",s:"XIXe siècle",el:1811,dc:1848,v:false,sec:null,
+ wk:"François-René_de_Chateaubriand",dom:"Littérature · Politique",
+ desc:"Père du romantisme français, ambassadeur et ministre sous la Restauration. Ses Mémoires d'outre-tombe, rédigés pour l'éternité, forment l'une des cathédrales de la prose française.",
+ oe:"Atala (1801) · Le Génie du christianisme (1802) · René · Mémoires d'outre-tombe (1848)"},
+{ac:"francaise",id:14,f:38,name:"Alexis de Tocqueville",ep:"",s:"XIXe siècle",el:1841,dc:1859,v:false,sec:null,
+ wk:"Alexis_de_Tocqueville",dom:"Philosophie politique · Histoire",
+ desc:"Aristocrate libéral parti étudier les prisons américaines, il en revint avec la première grande analyse de la démocratie moderne. Ministre des Affaires étrangères en 1849.",
+ oe:"De la démocratie en Amérique (2 vol., 1835–1840) · L'Ancien Régime et la Révolution (1856)"},
+{ac:"francaise",id:15,f:14,name:"Victor Hugo",ep:"l'Olympio",s:"XIXe siècle",el:1841,dc:1885,v:false,sec:null,
+ wk:"Victor_Hugo",dom:"Poésie · Roman · Théâtre",
+ desc:"Génie universel dominant tous les genres, pair de France en 1845, il s'exila vingt ans après le coup d'État de Louis-Napoléon. Ses obsèques nationales rassemblèrent deux millions de Parisiens.",
+ oe:"Hernani (1830) · Notre-Dame de Paris (1831) · Les Misérables (1862) · Les Contemplations (1856)"},
+{ac:"francaise",id:16,f:18,name:"Prosper Mérimée",ep:"",s:"XIXe siècle",el:1844,dc:1870,v:false,sec:null,
+ wk:"Prosper_Mérimée",dom:"Nouvelle · Histoire",
+ desc:"Inspecteur général des Monuments historiques, il contribua à sauver nombre de cathédrales médiévales. Maître de la nouvelle réaliste et ami intime de l'impératrice Eugénie.",
+ oe:"Mateo Falcone (1829) · La Vénus d'Ille (1837) · Colomba (1840) · Carmen (1845)"},
+{ac:"francaise",id:17,f:25,name:"Alfred de Vigny",ep:"",s:"XIXe siècle",el:1845,dc:1863,v:false,sec:null,
+ wk:"Alfred_de_Vigny",dom:"Poésie · Roman · Théâtre",
+ desc:"Romantique stoïcien, sa candidature essuya six refus avant l'élection de 1845. Il est le philosophe du romantisme, explorant la solitude du génie et la condition de l'artiste face à une société indifférente.",
+ oe:"Cinq-Mars (1826) · Chatterton (1835) · Servitude et grandeur militaires · Les Destinées (posth. 1864)"},
+{ac:"francaise",id:18,f:7,name:"Alfred de Musset",ep:"l'Enfant du siècle",s:"XIXe siècle",el:1852,dc:1857,v:false,sec:null,
+ wk:"Alfred_de_Musset",dom:"Poésie · Théâtre · Roman",
+ desc:"Enfant prodige du romantisme, ses amours tumultueuses avec George Sand nourrirent une œuvre incandescente. Sa Confession d'un enfant du siècle cristallisa le « mal du siècle ».",
+ oe:"Les Nuits (1835–1837) · Lorenzaccio (1834) · La Confession d'un enfant du siècle (1836) · On ne badine pas avec l'amour"},
+{ac:"francaise",id:19,f:13,name:"Ernest Renan",ep:"",s:"XIXe siècle",el:1879,dc:1892,v:false,sec:null,
+ wk:"Ernest_Renan",dom:"Philosophie · Histoire des religions",
+ desc:"Sémitisant et historien des religions, sa Vie de Jésus fit scandale en 1863 en traitant le Christ comme un personnage historique humain.",
+ oe:"Vie de Jésus (1863) · Qu'est-ce qu'une nation ? (1882) · Souvenirs d'enfance et de jeunesse (1883)"},
+{ac:"francaise",id:20,f:9,name:"Louis Pasteur",ep:"le Bienfaiteur de l'Humanité",s:"XIXe siècle",el:1881,dc:1895,v:false,sec:null,
+ wk:"Louis_Pasteur",dom:"Sciences · Médecine",
+ desc:"Seul savant élu à la fois à l'Académie française et à l'Académie des sciences. Sa pasteurisation et son vaccin contre la rage ont sauvé des millions de vies humaines.",
+ oe:"Théorie des germes (1878) · Vaccin contre le choléra (1880) · Vaccin contre la rage (1885) · Institut Pasteur (1887)"},
+{ac:"francaise",id:21,f:38,name:"Paul Valéry",ep:"",s:"XXe siècle",el:1925,dc:1945,v:false,sec:null,
+ wk:"Paul_Valéry",dom:"Poésie · Philosophie",
+ desc:"Héritier de Mallarmé, poète de l'intellect pur. Ses Cahiers, rédigés chaque matin pendant 50 ans, constituent un monument exceptionnel de la pensée vivante en acte.",
+ oe:"La Jeune Parque (1917) · Le Cimetière marin (1920) · Charmes (1922) · Eupalinos · Monsieur Teste"},
+{ac:"francaise",id:22,f:8,name:"Georges Duhamel",ep:"",s:"XXe siècle",el:1935,dc:1966,v:false,sec:null,
+ wk:"Georges_Duhamel",dom:"Roman · Essai",
+ desc:"Médecin de guerre aux Dardanelles, secrétaire perpétuel de l'Académie de 1944 à 1966. Humaniste convaincu, il défendit la primauté de la culture face à la civilisation de masse américaine.",
+ oe:"Vie des Martyrs (1917) · Civilisation (1918, prix Goncourt) · Chronique des Pasquier (1933–1945)"},
+{ac:"francaise",id:23,f:22,name:"François Mauriac",ep:"",s:"XXe siècle",el:1933,dc:1970,v:false,sec:null,
+ wk:"François_Mauriac",dom:"Roman · Essai",
+ desc:"Prix Nobel de littérature en 1952, romancier du péché et de la grâce dans la bourgeoisie bordelaise. Il s'opposa avec vigueur à la torture pendant la guerre d'Algérie.",
+ oe:"Thérèse Desqueyroux (1927) · Le Nœud de vipères (1932) · Genitrix · Bloc-notes (1952–1970)"},
+{ac:"francaise",id:24,f:26,name:"André Maurois",ep:"",s:"XXe siècle",el:1938,dc:1967,v:false,sec:null,
+ wk:"André_Maurois",dom:"Biographie · Roman",
+ desc:"Officier de liaison britannique pendant la Grande Guerre, maître de la biographie romancée, il fit connaître aux Français la littérature anglaise et américaine.",
+ oe:"Ariel ou la Vie de Shelley (1923) · Les Silences du colonel Bramble · Histoire de la France · Histoire d'Angleterre"},
+{ac:"francaise",id:25,f:30,name:"Paul Claudel",ep:"",s:"XXe siècle",el:1946,dc:1955,v:false,sec:null,
+ wk:"Paul_Claudel",dom:"Théâtre · Poésie",
+ desc:"Converti au catholicisme devant Notre-Dame la nuit de Noël 1886, diplomate de carrière, grand créateur du théâtre lyrique moderne. Son Soulier de satin est l'une des œuvres les plus ambitieuses du répertoire français.",
+ oe:"L'Annonce faite à Marie (1912) · Le Soulier de satin (1929) · Cinq Grandes Odes (1910) · L'Otage"},
+{ac:"francaise",id:26,f:21,name:"Marcel Pagnol",ep:"",s:"XXe siècle",el:1946,dc:1974,v:false,sec:null,
+ wk:"Marcel_Pagnol",dom:"Théâtre · Cinéma · Roman",
+ desc:"Premier cinéaste élu à l'Académie française. Sa trilogie marseillaise et ses souvenirs d'enfance dessinent le portrait intemporel d'une Provence solaire.",
+ oe:"Marius (1929) · Fanny (1931) · César (1936) · La Gloire de mon père (1957) · Manon des sources"},
+{ac:"francaise",id:27,f:40,name:"Julien Green",ep:"",s:"XXe siècle",el:1971,dc:1998,v:false,sec:null,
+ wk:"Julien_Green",dom:"Roman",
+ desc:"Américain de naissance, entièrement français de culture, premier écrivain de nationalité étrangère élu à l'Académie. Son Journal tenu pendant 70 ans est un monument de la littérature introspective.",
+ oe:"Adrienne Mesurat (1927) · Léviathan (1929) · Moïra (1950) · Journal (70 vol., 1928–1998)"},
+{ac:"francaise",id:28,f:3,name:"Marguerite Yourcenar",ep:"la Première Immortelle",s:"XXe siècle",el:1980,dc:1987,v:false,sec:null,
+ wk:"Marguerite_Yourcenar",dom:"Roman · Essai",
+ desc:"Première femme élue à l'Académie française après 345 ans d'existence masculine. Son œuvre, nourrie d'érudition et de méditation sur l'histoire, est parmi les plus belles du siècle.",
+ oe:"Mémoires d'Hadrien (1951) · L'Œuvre au noir (1968) · Feux · Nouvelles orientales · Le Labyrinthe du monde"},
+{ac:"francaise",id:29,f:12,name:"Jean d'Ormesson",ep:"",s:"XXe siècle",el:1973,dc:2017,v:false,sec:null,
+ wk:"Jean_d'Ormesson",dom:"Roman · Essai",
+ desc:"Visage souriant et esprit vif de l'Académie pendant 44 ans, directeur du Figaro (1974–1977), l'un des plus ardents défenseurs de la langue française.",
+ oe:"La Gloire de l'Empire (1971) · Au plaisir de Dieu (1974) · Le Vent du soir · C'était bien"},
+{ac:"francaise",id:30,f:16,name:"Léopold Sédar Senghor",ep:"",s:"XXe siècle",el:1983,dc:2001,v:false,sec:null,
+ wk:"Léopold_Sédar_Senghor",dom:"Poésie · Politique",
+ desc:"Premier président du Sénégal indépendant, co-fondateur de la Négritude, premier Africain élu à l'Académie française. Poète, philosophe et homme d'État.",
+ oe:"Chants d'ombre (1945) · Hosties noires (1948) · Éthiopiques (1956) · Lettres d'hivernage (1973)"},
+{ac:"francaise",id:31,f:30,name:"Maurice Druon",ep:"",s:"XXe siècle",el:1966,dc:2009,v:false,sec:null,
+ wk:"Maurice_Druon",dom:"Roman · Politique",
+ desc:"Auteur des Rois maudits, secrétaire perpétuel de l'Académie de 1985 à 1999, gardien intransigeant de la langue française contre les anglicismes.",
+ oe:"Les Rois maudits (7 vol., 1955–1977) · Le Chant du départ (1944) · La Fin des hommes"},
+{ac:"francaise",id:32,f:34,name:"Hélène Carrère d'Encausse",ep:"",s:"XXe siècle",el:1990,dc:2023,v:false,sec:null,
+ wk:"Hélène_Carrère_d'Encausse",dom:"Histoire · Russie",
+ desc:"Historienne de la Russie, elle prédit dès 1978 l'éclatement de l'URSS. Secrétaire perpétuelle de l'Académie de 1999 à 2023, la gardienne la plus longtemps en poste de son histoire.",
+ oe:"L'Empire éclaté (1978) · Staline (1979) · Lénine (1998) · Catherine II (2002)"},
+{ac:"francaise",id:33,f:28,name:"Erik Orsenna",ep:"",s:"XXe siècle",el:1998,dc:null,v:true,sec:null,
+ wk:"Erik_Orsenna",dom:"Roman · Essai",
+ desc:"Économiste et romancier, conseiller de François Mitterrand, prix Goncourt 1988 pour L'Exposition coloniale. Membre du Conseil d'État.",
+ oe:"L'Exposition coloniale (1988, Goncourt) · La Grammaire est une chanson douce · Portrait du Gulf Stream · Longtemps"},
+{ac:"francaise",id:34,f:36,name:"Florence Delay",ep:"",s:"XXIe siècle",el:2000,dc:null,v:true,sec:null,
+ wk:"Florence_Delay",dom:"Roman · Théâtre",
+ desc:"Comédienne — elle avait joué Jeanne d'Arc dans le film de Bresson — et romancière, fille de l'académicien Jean Delay. Elle co-traduisit en vers la Comédie de Dante pour la Pléiade.",
+ oe:"Minuit sur les jeux (1977) · Dit Nerval (1999) · À ce soir · Traduction de Dante (Pléiade)"},
+{ac:"francaise",id:35,f:32,name:"Pierre Nora",ep:"",s:"XXIe siècle",el:2001,dc:null,v:true,sec:null,
+ wk:"Pierre_Nora",dom:"Histoire",
+ desc:"Historien de la mémoire collective, fondateur du département sciences humaines de Gallimard, inventeur du concept de « lieux de mémoire ». Directeur de la revue Le Débat pendant 40 ans.",
+ oe:"Les Lieux de mémoire (7 vol., 1984–1992) · Présent, nation, mémoire · Les Français"},
+{ac:"francaise",id:36,f:9,name:"Jean-Christophe Rufin",ep:"",s:"XXIe siècle",el:2008,dc:null,v:true,sec:null,
+ wk:"Jean-Christophe_Rufin",dom:"Roman · Voyage",
+ desc:"Médecin humanitaire, cofondateur de Médecins sans frontières, ambassadeur de France au Sénégal. Prix Goncourt 2001 pour Rouge Brésil.",
+ oe:"L'Abyssin (1997) · Rouge Brésil (2001, Goncourt) · Le Parfum d'Adam · Immortelle randonnée"},
+{ac:"francaise",id:37,f:13,name:"Simone Veil",ep:"",s:"XXIe siècle",el:2008,dc:2017,v:false,sec:null,
+ wk:"Simone_Veil",dom:"Politique · Mémoire",
+ desc:"Survivante d'Auschwitz, ministre de la Santé qui fit adopter la loi dépénalisant l'IVG (1975), présidente du Parlement européen (1979–1982). Elle repose au Panthéon depuis 2018.",
+ oe:"Loi Veil — IVG (1975) · Présidence du Parlement européen (1979) · Une vie (mémoires, 2007)"},
+{ac:"francaise",id:38,f:29,name:"Amin Maalouf",ep:"",s:"XXIe siècle",el:2011,dc:null,v:true,sec:null,
+ wk:"Amin_Maalouf",dom:"Roman · Essai",
+ desc:"Romancier franco-libanais, secrétaire perpétuel de l'Académie depuis 2023. Prix Goncourt en 1993 pour Le Rocher de Tanios.",
+ oe:"Léon l'Africain (1986) · Samarcande (1988) · Le Rocher de Tanios (1993, Goncourt) · Les Identités meurtrières"},
+{ac:"francaise",id:39,f:2,name:"Dany Laferrière",ep:"",s:"XXIe siècle",el:2015,dc:null,v:true,sec:null,
+ wk:"Dany_Laferrière",dom:"Roman · Autobiographie",
+ desc:"Écrivain haïtien-québécois, premier ressortissant haïtien à rejoindre l'Académie. Son œuvre autobiographique explore l'identité entre Haïti, Montréal et Paris.",
+ oe:"Comment faire l'amour avec un Nègre sans se fatiguer (1985) · Le Goût des jeunes filles · L'Énigme du retour (2009, Médicis)"},
+{ac:"francaise",id:40,f:16,name:"Boualem Sansal",ep:"",s:"XXIe siècle",el:2024,dc:null,v:true,sec:null,
+ wk:"Boualem_Sansal",dom:"Roman",
+ desc:"Romancier algérien d'expression française, élu en 2024, arrêté à Alger en novembre 2024 et détenu en Algérie. Son fauteuil, encore vacant, est devenu symbole de liberté d'expression.",
+ oe:"Le Serment des barbares (1999) · Harraga (2005) · Le Village de l'Allemand (2008) · 2084 : La Fin du monde (2015)"},
+
+// ─── 📜 ACADÉMIE DES INSCRIPTIONS ET BELLES-LETTRES (15) ────────
+
+{ac:"inscriptions",id:101,f:null,name:"Jean Mabillon",ep:"Père de la diplomatique",s:"XVIIe siècle",el:1701,dc:1707,v:false,sec:"Paléographie",
+ wk:"Jean_Mabillon",dom:"Paléographie · Hagiographie",
+ desc:"Bénédictin de Saint-Maur, fondateur de la diplomatique, il établit les règles scientifiques permettant d'authentifier les documents anciens. Sa méthode révolutionna l'érudition historique.",
+ oe:"De Re Diplomatica (1681) · Acta Sanctorum Ordinis Sancti Benedicti · Annales Ordinis Sancti Benedicti"},
+{ac:"inscriptions",id:102,f:null,name:"Nicolas Fréret",ep:"",s:"XVIIIe siècle",el:1714,dc:1749,v:false,sec:"Histoire ancienne",
+ wk:"Nicolas_Fréret",dom:"Histoire ancienne · Chronologie",
+ desc:"Secrétaire perpétuel de l'Académie de 1743 à sa mort, emprisonné à la Bastille en 1714 pour avoir mis en doute l'origine troyenne des Francs. Sa vaste érudition couvrait l'histoire, la chronologie et la linguistique orientale.",
+ oe:"Réflexions sur l'étude des anciennes histoires · Mémoire sur la chronologie de la Chine · Lettre de Thrasybule à Leucippe (posth.)"},
+{ac:"inscriptions",id:103,f:null,name:"Jean-François Champollion",ep:"le Déchiffreur",s:"XIXe siècle",el:1830,dc:1832,v:false,sec:"Égyptologie",
+ wk:"Jean-François_Champollion",dom:"Égyptologie · Linguistique",
+ desc:"Après quinze ans de travail acharné sur la pierre de Rosette, il annonça le 27 septembre 1822 le déchiffrement des hiéroglyphes. Premier conservateur du département égyptien du Louvre, il mourut épuisé à 41 ans.",
+ oe:"Lettre à M. Dacier (1822) · Précis du système hiéroglyphique (1824) · Grammaire égyptienne (posth. 1836)"},
+{ac:"inscriptions",id:104,f:null,name:"Gaston Paris",ep:"Père de la philologie romane",s:"XIXe siècle",el:1876,dc:1903,v:false,sec:"Philologie romane",
+ wk:"Gaston_Paris",dom:"Philologie romane · Littérature médiévale",
+ desc:"Fondateur de la revue Romania, professeur au Collège de France, il créa la philologie romane comme discipline scientifique en France, appliquant la linguistique historique à l'étude des lettres médiévales françaises.",
+ oe:"Histoire poétique de Charlemagne (1865) · La Littérature française au Moyen Âge (1888) · Romania (revue fondée 1872)"},
+{ac:"inscriptions",id:105,f:null,name:"Émile Mâle",ep:"l'Historien de l'art médiéval",s:"XXe siècle",el:1918,dc:1954,v:false,sec:"Art médiéval",
+ wk:"Émile_Mâle",dom:"Histoire de l'art · Iconographie",
+ desc:"Directeur de l'École française de Rome (1923–1937), il révéla la signification symbolique et théologique des programmes iconographiques des cathédrales gothiques.",
+ oe:"L'Art religieux du XIIIe siècle en France (1898) · L'Art religieux de la fin du Moyen Âge · L'Art et les artistes du Moyen Âge"},
+{ac:"inscriptions",id:106,f:null,name:"Jacqueline de Romilly",ep:"l'Helléniste",s:"XXe siècle",el:1975,dc:2010,v:false,sec:"Grec",
+ wk:"Jacqueline_de_Romilly",dom:"Grec ancien · Thucydide",
+ desc:"Première femme élue à l'AIBL (1975), puis à l'Académie française (1988). Spécialiste de Thucydide et de la démocratie athénienne, professeur au Collège de France, elle défendit sa vie durant l'enseignement du grec en France.",
+ oe:"Thucydide et l'impérialisme athénien (1947) · La Tragédie grecque · La Douceur dans la pensée grecque · Alcibiade"},
+{ac:"inscriptions",id:107,f:null,name:"Pierre Grimal",ep:"le Latiniste",s:"XXe siècle",el:1961,dc:1996,v:false,sec:"Latinité",
+ wk:"Pierre_Grimal",dom:"Latin · Civilisation romaine",
+ desc:"Professeur à la Sorbonne, le plus grand latiniste français du XXe siècle. Son Dictionnaire de la mythologie grecque et romaine est traduit en vingt langues et demeure l'ouvrage de référence mondial.",
+ oe:"Dictionnaire de la mythologie grecque et romaine (1951) · La Civilisation romaine · Virgile ou La Seconde Naissance de Rome"},
+{ac:"inscriptions",id:108,f:null,name:"Paul Pelliot",ep:"l'Orientaliste",s:"XXe siècle",el:1911,dc:1945,v:false,sec:"Asie centrale",
+ wk:"Paul_Pelliot",dom:"Sinologie · Asie centrale",
+ desc:"Plus grand sinologue de son époque, il rapporta de Dunhuang des milliers de manuscrits précieux. Professeur au Collège de France, il maîtrisait une quinzaine de langues orientales et révolutionna la connaissance de l'Asie centrale médiévale.",
+ oe:"Notes on Marco Polo · Les Grottes de Touen-houang · L'Histoire secrète des Mongols"},
+{ac:"inscriptions",id:109,f:null,name:"Henri Maspero",ep:"",s:"XXe siècle",el:1927,dc:1945,v:false,sec:"Asie orientale",
+ wk:"Henri_Maspero",dom:"Chine ancienne · Taoïsme",
+ desc:"Directeur de l'École française d'Extrême-Orient, spécialiste de la Chine ancienne et du taoïsme. Déporté à Buchenwald, il y mourut en 1945. Ses travaux sur le taoïsme restent fondateurs.",
+ oe:"La Chine antique (1927) · Le Taoïsme et les religions chinoises · Mélanges posthumes"},
+{ac:"inscriptions",id:110,f:null,name:"Georges Dumézil",ep:"",s:"XXe siècle",el:1974,dc:1986,v:false,sec:"Mythologie comparée",
+ wk:"Georges_Dumézil",dom:"Mythologie indo-européenne",
+ desc:"Fondateur de la mythologie comparée indo-européenne, il identifia la trifonctionnalité (prêtres/guerriers/producteurs) comme structure commune aux civilisations indo-européennes. Professeur au Collège de France, il renouvela l'histoire des religions.",
+ oe:"Mitra-Varuna (1940) · Jupiter Mars Quirinus · L'idéologie tripartite des Indo-Européens · Mythe et Épopée"},
+{ac:"inscriptions",id:111,f:null,name:"Roland de Vaux",ep:"",s:"XXe siècle",el:1959,dc:1971,v:false,sec:"Archéologie biblique",
+ wk:"Roland_de_Vaux",dom:"Archéologie · Bible",
+ desc:"Dominicain, directeur de l'École biblique de Jérusalem, il dirigea les fouilles de Qumrân et édita les premiers manuscrits de la mer Morte. Ses travaux sur les institutions de l'Ancien Testament font autorité.",
+ oe:"Les Institutions de l'Ancien Testament (2 vol.) · L'Archéologie et les manuscrits de la mer Morte"},
+{ac:"inscriptions",id:112,f:null,name:"Jean Leclant",ep:"",s:"XXIe siècle",el:1971,dc:2011,v:false,sec:"Égyptologie",
+ wk:"Jean_Leclant",dom:"Égyptologie · Nubie",
+ desc:"Secrétaire perpétuel de l'AIBL de 1983 à 2011, il dirigea des fouilles majeures en Égypte et au Soudan. Encyclopédiste de l'égyptologie, il coordonna le Lexikon der Ägyptologie.",
+ oe:"Enquêtes sur les sacerdoces · Recherches sur les monuments thébains · Atlas des formes hiéroglyphiques"},
+{ac:"inscriptions",id:113,f:null,name:"Michel Zink",ep:"",s:"XXIe siècle",el:1997,dc:null,v:true,sec:"Littérature médiévale",
+ wk:"Michel_Zink",dom:"Littérature médiévale française",
+ desc:"Secrétaire perpétuel de l'AIBL depuis 2013, professeur au Collège de France, il est le plus grand médiéviste français vivant. Ses travaux sur la lyrique médiévale et la subjectivité au Moyen Âge ont renouvelé l'approche de la littérature des XIIe et XIIIe siècles.",
+ oe:"La Subjectivité littéraire (1985) · La Pastourelle · Froissart et le temps · Introduction à la littérature française du Moyen Âge"},
+{ac:"inscriptions",id:114,f:null,name:"Yves Coppens",ep:"Père de Lucy",s:"XXIe siècle",el:1985,dc:2022,v:false,sec:"Paléontologie humaine",
+ wk:"Yves_Coppens",dom:"Paléontologie · Préhistoire",
+ desc:"Co-découvreur de Lucy en 1974, l'australopithèque de 3,2 millions d'années qui révolutionna la paléoanthropologie. Professeur au Collège de France, il popularisa les sciences de la préhistoire auprès du grand public.",
+ oe:"Le Singe, l'Afrique et l'homme (1983) · Pré-ambules · Lucy et les siens · Chers ancêtres"},
+{ac:"inscriptions",id:115,f:null,name:"Dominique Charpin",ep:"",s:"XXIe siècle",el:2010,dc:null,v:true,sec:"Assyriologie",
+ wk:"Dominique_Charpin",dom:"Assyriologie · Mésopotamie",
+ desc:"Professeur au Collège de France, principal assyriologue français, spécialiste de l'époque paléo-babylonienne et de la correspondance royale de Mari. Ses travaux sur l'écriture cunéiforme et la société mésopotamienne font référence.",
+ oe:"Lire et écrire à Babylone (2008) · Le Clergé d'Ur au siècle d'Hammurabi · Archives épistolaires de Mari"},
+
+// ─── 🔭 ACADÉMIE DES SCIENCES (15) ──────────────────────────────
+
+{ac:"sciences",id:201,f:null,name:"René Descartes",ep:"le Père des mathématiques modernes",s:"XVIIe siècle",el:1666,dc:1650,v:false,sec:"Mathématiques",
+ wk:"René_Descartes",dom:"Mathématiques · Philosophie",
+ desc:"Fondateur de la géométrie analytique et du rationalisme philosophique, il unifia algèbre et géométrie par le plan cartésien. Son Discours de la méthode posa les bases de la pensée scientifique moderne.",
+ oe:"Discours de la méthode (1637) · La Géométrie · Méditations métaphysiques (1641) · Principes de la philosophie (1644)"},
+{ac:"sciences",id:202,f:null,name:"Blaise Pascal",ep:"le Génie précoce",s:"XVIIe siècle",el:1666,dc:1662,v:false,sec:"Mathématiques · Physique",
+ wk:"Blaise_Pascal",dom:"Mathématiques · Physique · Philosophie",
+ desc:"Enfant prodige qui inventa une machine à calculer à 18 ans, il découvrit le triangle arithmétique, les fondements du calcul des probabilités avec Fermat, et prouva l'existence du vide. Ses Pensées restent un sommet de la prose française.",
+ oe:"Traité du triangle arithmétique (1654) · Pensées (posth. 1669) · Lettres provinciales · Expériences sur le vide"},
+{ac:"sciences",id:203,f:null,name:"Antoine Lavoisier",ep:"Père de la chimie moderne",s:"XVIIIe siècle",el:1768,dc:1794,v:false,sec:"Chimie",
+ wk:"Antoine_Lavoisier",dom:"Chimie · Physique",
+ desc:"Il réfuta la théorie du phlogistique, identifia l'oxygène et l'hydrogène, formula la loi de conservation de la masse et créa la nomenclature chimique moderne. Guillotiné pendant la Terreur, il incarna la tragédie de la Révolution face aux savants.",
+ oe:"Traité élémentaire de chimie (1789) · Opuscules physiques et chimiques · Mémoire sur la respiration"},
+{ac:"sciences",id:204,f:null,name:"Pierre-Simon de Laplace",ep:"le Newton français",s:"XVIIIe siècle",el:1773,dc:1827,v:false,sec:"Mathématiques",
+ wk:"Pierre-Simon_de_Laplace",dom:"Astronomie · Mathématiques",
+ desc:"Il développa la mécanique céleste, la théorie des probabilités et posa l'hypothèse nébulaire de la formation du système solaire. Sa réponse à Napoléon — « Je n'avais pas besoin de cette hypothèse » à propos de Dieu — reste célèbre.",
+ oe:"Traité de mécanique céleste (5 vol., 1799–1825) · Théorie analytique des probabilités (1812) · Exposition du système du monde"},
+{ac:"sciences",id:205,f:null,name:"André-Marie Ampère",ep:"le Newton de l'électricité",s:"XIXe siècle",el:1814,dc:1836,v:false,sec:"Physique",
+ wk:"André-Marie_Ampère",dom:"Électricité · Mathématiques",
+ desc:"Fondateur de l'électrodynamique, il formula en une semaine (1820) les lois reliant électricité et magnétisme que Maxwell perfectionna plus tard. Le nom de l'ampère, unité internationale d'intensité du courant, perpétue son souvenir.",
+ oe:"Mémoire sur les effets du courant électrique (1820) · Théorie mathématique des phénomènes électrodynamiques (1826)"},
+{ac:"sciences",id:206,f:null,name:"Augustin-Louis Cauchy",ep:"le Père de l'analyse mathématique",s:"XIXe siècle",el:1816,dc:1857,v:false,sec:"Mathématiques",
+ wk:"Augustin-Louis_Cauchy",dom:"Mathématiques · Analyse",
+ desc:"Il posa les bases rigoureuses de l'analyse mathématique (limites, continuité, convergence), rédigea 800 mémoires et contribua à l'algèbre, la physique mathématique et l'optique. Sa productivité scientifique fut exceptionnelle.",
+ oe:"Cours d'analyse (1821) · Résumé des leçons sur le calcul infinitésimal · Exercices de mathématiques"},
+{ac:"sciences",id:207,f:null,name:"Louis Pasteur",ep:"le Bienfaiteur de l'Humanité",s:"XIXe siècle",el:1862,dc:1895,v:false,sec:"Chimie · Biologie",
+ wk:"Louis_Pasteur",dom:"Microbiologie · Chimie",
+ desc:"Réfuta la génération spontanée, fonda la microbiologie, inventa la pasteurisation et les vaccins contre le choléra des poules, le charbon et la rage. Seul savant élu à la fois à l'Académie des sciences et à l'Académie française.",
+ oe:"Études sur les maladies des vers à soie · Études sur la bière · Vaccin contre la rage (1885) · Institut Pasteur (fondé 1887)"},
+{ac:"sciences",id:208,f:null,name:"Henri Poincaré",ep:"le Dernier Universaliste",s:"XIXe siècle",el:1887,dc:1912,v:false,sec:"Mathématiques",
+ wk:"Henri_Poincaré",dom:"Mathématiques · Physique mathématique",
+ desc:"Dernier grand mathématicien à maîtriser tous les domaines de sa discipline, il anticipa partiellement la relativité restreinte avant Einstein, fonda la topologie algébrique et posa la conjecture de Poincaré, démontrée un siècle plus tard par Perelman.",
+ oe:"Les Méthodes nouvelles de la mécanique céleste · La Science et l'hypothèse (1902) · Science et méthode (1908)"},
+{ac:"sciences",id:209,f:null,name:"Marie Curie",ep:"la Dame du radium",s:"XIXe siècle",el:1911,dc:1934,v:false,sec:"Physique · Chimie",
+ wk:"Marie_Curie",dom:"Physique · Chimie",
+ desc:"Première femme Prix Nobel (physique 1903, chimie 1911), seule personne à recevoir deux Prix Nobel dans deux disciplines différentes. Elle découvrit le polonium et le radium et fonda le premier laboratoire de radioactivité. L'Académie des sciences lui refusa l'élection d'une voix en 1911.",
+ oe:"Recherches sur les substances radioactives (1903) · Traité de radioactivité (1910) · Institut du Radium (fondé 1914)"},
+{ac:"sciences",id:210,f:null,name:"Paul Langevin",ep:"",s:"XXe siècle",el:1934,dc:1946,v:false,sec:"Physique",
+ wk:"Paul_Langevin",dom:"Physique · Magnétisme",
+ desc:"Pionnier de la physique moderne en France, ami d'Einstein et défenseur de la relativité, il inventa le sonar ultrasonique. Arrêté par les Nazis en 1940, il s'évada en Suisse. Président du Comité mondial de lutte contre le fascisme.",
+ oe:"La Physique depuis vingt ans (1923) · La Notion de corpuscules et d'atomes · Œuvres scientifiques"},
+{ac:"sciences",id:211,f:null,name:"Frédéric Joliot-Curie",ep:"",s:"XXe siècle",el:1943,dc:1958,v:false,sec:"Physique nucléaire",
+ wk:"Frédéric_Joliot-Curie",dom:"Physique nucléaire",
+ desc:"Gendre de Marie Curie, Prix Nobel de chimie 1935 avec Irène pour la découverte de la radioactivité artificielle. Directeur du CNRS puis Haut-Commissaire à l'énergie atomique, il construisit le premier réacteur nucléaire français (ZOE, 1948).",
+ oe:"Radioactivité artificielle (1935, Nobel) · Réacteur ZOE (1948) · Fondateur du CNRS (1939)"},
+{ac:"sciences",id:212,f:null,name:"Jacques Monod",ep:"",s:"XXe siècle",el:1967,dc:1976,v:false,sec:"Biologie",
+ wk:"Jacques_Monod",dom:"Biologie moléculaire",
+ desc:"Prix Nobel de médecine 1965 avec Jacob et Lwoff pour la découverte des mécanismes de régulation génique (opéron). Directeur de l'Institut Pasteur. Son essai philosophique Le Hasard et la Nécessité eut un retentissement mondial.",
+ oe:"Le Hasard et la Nécessité (1970) · L'Opéron lac (1961, Nobel) · Les Microbes et l'homme"},
+{ac:"sciences",id:213,f:null,name:"André Lwoff",ep:"",s:"XXe siècle",el:1959,dc:1994,v:false,sec:"Microbiologie",
+ wk:"André_Lwoff",dom:"Microbiologie · Virologie",
+ desc:"Prix Nobel de médecine 1965 pour la découverte des prophages et du contrôle viral. Directeur du département de microbiologie de l'Institut Pasteur, il forma toute une génération de biologistes français dont Monod et Jacob.",
+ oe:"L'Évolution physiologique (1943) · Problèmes de morphogenèse · L'Ordre biologique"},
+{ac:"sciences",id:214,f:null,name:"Alain Aspect",ep:"",s:"XXIe siècle",el:2005,dc:null,v:true,sec:"Physique quantique",
+ wk:"Alain_Aspect",dom:"Physique quantique · Optique",
+ desc:"Prix Nobel de physique 2022 pour ses expériences fondamentales sur l'intrication quantique qui prouvèrent la violation des inégalités de Bell. Professeur à l'École polytechnique et à l'Institut d'Optique, pionnier de l'information quantique.",
+ oe:"Intrication quantique (expériences 1981–1982) · Nobel de physique 2022 · Cours de physique quantique"},
+{ac:"sciences",id:215,f:null,name:"Cédric Villani",ep:"la Bête des mathématiques",s:"XXIe siècle",el:2013,dc:null,v:true,sec:"Mathématiques",
+ wk:"Cédric_Villani",dom:"Mathématiques · Physique mathématique",
+ desc:"Médaille Fields 2010 (Prix Nobel des mathématiques) pour ses travaux sur les équations de Boltzmann et l'amortissement Landau. Directeur de l'Institut Henri-Poincaré, député de l'Essonne (2017–2022). Célèbre pour ses cravates araignée.",
+ oe:"Optimal Transport (2003) · Théorème vivant (2012) · Les Équations de la fluidité"},
+
+// ─── 🎨 ACADÉMIE DES BEAUX-ARTS (15) ────────────────────────────
+
+{ac:"beauxarts",id:301,f:1,name:"Charles Le Brun",ep:"le Peintre du Roi",s:"XVIIe siècle",el:1648,dc:1690,v:false,sec:"Peinture",
+ wk:"Charles_Le_Brun",dom:"Peinture · Décoration",
+ desc:"Premier peintre de Louis XIV, directeur de l'Académie royale, créateur de la Manufacture des Gobelins, il organisa toute la vie artistique du Grand Siècle. Il décora personnellement la galerie des Glaces de Versailles et conçut la plupart des appartements royaux.",
+ oe:"Galerie des Glaces (1678–1686) · Batailles d'Alexandre · Décoration du Louvre · Gobelins (1662)"},
+{ac:"beauxarts",id:302,f:2,name:"Jules Hardouin-Mansart",ep:"l'Architecte du Roi-Soleil",s:"XVIIe siècle",el:1685,dc:1708,v:false,sec:"Architecture",
+ wk:"Jules_Hardouin-Mansart",dom:"Architecture",
+ desc:"Surintendant des Bâtiments du Roi, il paracheva Versailles en doublant le château et créant la galerie des Glaces, construisit l'hôtel des Invalides avec sa chapelle royale et la place Vendôme. Architecte d'une fécondité exceptionnelle au service de la gloire monarchique.",
+ oe:"Galerie des Glaces (1678) · Dôme des Invalides (1706) · Place Vendôme · Grand Trianon · Place des Victoires"},
+{ac:"beauxarts",id:303,f:3,name:"Jean-Antoine Houdon",ep:"le Sculpteur des Lumières",s:"XVIIIe siècle",el:1777,dc:1828,v:false,sec:"Sculpture",
+ wk:"Jean-Antoine_Houdon",dom:"Sculpture",
+ desc:"Le plus grand portraitiste en sculpture des Lumières, il modela les visages de Voltaire, Rousseau, Diderot, Washington et Jefferson. Sa statue assise de Voltaire au Comédie-Française reste l'image définitive du philosophe.",
+ oe:"Voltaire assis (1781) · Washington (1788) · Buste de Diderot · Diane chasseresse · Frileuse"},
+{ac:"beauxarts",id:304,f:4,name:"Jacques-Louis David",ep:"le Peintre de l'Histoire",s:"XVIIIe siècle",el:1784,dc:1825,v:false,sec:"Peinture",
+ wk:"Jacques-Louis_David",dom:"Peinture",
+ desc:"Chef de file du néoclassicisme, peintre officiel de la Révolution puis de Napoléon, il immortalisa le Sacre de l'Empereur et le serment des Horaces. Député à la Convention, il vota la mort du roi et fut exilé à Bruxelles après Waterloo.",
+ oe:"Le Serment des Horaces (1784) · La Mort de Marat (1793) · Le Sacre de Napoléon (1806–1807) · Léonidas aux Thermopyles"},
+{ac:"beauxarts",id:305,f:5,name:"Eugène Delacroix",ep:"Prince des Romantiques",s:"XIXe siècle",el:1857,dc:1863,v:false,sec:"Peinture",
+ wk:"Eugène_Delacroix",dom:"Peinture",
+ desc:"Chef de file du romantisme pictural, sa Liberté guidant le peuple est l'icône de la peinture française du XIXe siècle. Six fois refusé à l'Académie avant son élection en 1857, il décora le Salon du Roi du Palais-Bourbon et la bibliothèque du Sénat.",
+ oe:"La Liberté guidant le peuple (1830) · La Mort de Sardanapale (1827) · Femmes d'Alger (1834) · Prise de Constantinople"},
+{ac:"beauxarts",id:306,f:6,name:"Charles Gounod",ep:"",s:"XIXe siècle",el:1866,dc:1893,v:false,sec:"Musique",
+ wk:"Charles_Gounod",dom:"Musique · Opéra",
+ desc:"Compositeur de Faust et Roméo et Juliette, opéras qui triomphèrent dans toute l'Europe. Sa mélodie sur le prélude de Bach — l'Ave Maria — est l'une des pièces musicales les plus entendues au monde.",
+ oe:"Faust (1859) · Roméo et Juliette (1867) · Ave Maria · Mireille (1864) · Messe solennelle de Sainte-Cécile"},
+{ac:"beauxarts",id:307,f:7,name:"Camille Saint-Saëns",ep:"",s:"XIXe siècle",el:1881,dc:1921,v:false,sec:"Musique",
+ wk:"Camille_Saint-Saëns",dom:"Musique",
+ desc:"Enfant prodige au piano, compositeur prolifique et virtuose, il fut l'un des premiers à composer une musique de film (L'Assassinat du duc de Guise, 1908). Son Carnaval des animaux, publié posthume, reste la pièce musicale française la plus jouée.",
+ oe:"Le Carnaval des animaux · Samson et Dalila (1877) · Symphonie n°3 avec orgue · Danse macabre"},
+{ac:"beauxarts",id:308,f:8,name:"Auguste Rodin",ep:"le Sculpteur du siècle",s:"XIXe siècle",el:1917,dc:1917,v:false,sec:"Sculpture",
+ wk:"Auguste_Rodin",dom:"Sculpture",
+ desc:"Le plus grand sculpteur depuis Michel-Ange, élu à l'Académie l'année de sa mort. Ses Bourgeois de Calais, Le Penseur, Le Baiser révolutionnèrent la sculpture en rejetant l'idéalisation académique au profit d'une vérité psychologique et physique intense.",
+ oe:"L'Âge d'airain (1877) · Les Bourgeois de Calais (1889) · Le Penseur · La Porte de l'Enfer · Le Baiser"},
+{ac:"beauxarts",id:309,f:9,name:"Claude Debussy",ep:"le Père de la musique impressionniste",s:"XIXe siècle",el:1884,dc:1918,v:false,sec:"Musique",
+ wk:"Claude_Debussy",dom:"Musique",
+ desc:"Révolutionnaire de la musique française, il brisa les règles harmoniques traditionnelles et créa un langage musical impressionniste fondé sur la couleur et le mouvement sonores. L'Après-midi d'un faune (1894) inaugura la musique du XXe siècle.",
+ oe:"Prélude à l'après-midi d'un faune (1894) · Pelléas et Mélisande (1902) · La Mer (1905) · Images · Children's Corner"},
+{ac:"beauxarts",id:310,f:10,name:"Gabriel Fauré",ep:"",s:"XXe siècle",el:1909,dc:1924,v:false,sec:"Musique",
+ wk:"Gabriel_Fauré",dom:"Musique",
+ desc:"Directeur du Conservatoire de Paris (1905–1920), maître de la mélodie française. Sourd dans ses dernières années, il composa son quatuor à cordes dans cet état. Son Requiem, d'une sérénité absolue, est l'une des partitions les plus jouées du répertoire sacré.",
+ oe:"Requiem (1888) · Nocturnes pour piano · La Bonne Chanson · Pelléas et Mélisande (suite)"},
+{ac:"beauxarts",id:311,f:11,name:"Le Corbusier",ep:"l'Architecte du siècle",s:"XXe siècle",el:1975,dc:1965,v:false,sec:"Architecture",
+ wk:"Le_Corbusier",dom:"Architecture · Urbanisme",
+ desc:"L'architecte le plus influent du XXe siècle, fondateur du mouvement moderne international. Sa Villa Savoye, la Cité radieuse de Marseille et l'Unité d'habitation révolutionnèrent l'architecture mondiale. Ses œuvres sont classées au patrimoine mondial de l'UNESCO.",
+ oe:"Villa Savoye (1931) · Cité radieuse de Marseille (1952) · Chandigarh (1951) · Vers une architecture (1923)"},
+{ac:"beauxarts",id:312,f:12,name:"Henri Cartier-Bresson",ep:"l'Œil du siècle",s:"XXe siècle",el:2003,dc:2004,v:false,sec:"Photographie",
+ wk:"Henri_Cartier-Bresson",dom:"Photographie",
+ desc:"Fondateur de l'agence Magnum (1947), inventeur du concept de « l'instant décisif » qui définit la photographie de reportage moderne. La première personnalité photographe élue de l'Académie. Il abandonna la photographie pour le dessin dans ses dernières années.",
+ oe:"Images à la sauvette (1952) · L'Instant décisif · Henri Cartier-Bresson photographe · De l'U.R.S.S."},
+{ac:"beauxarts",id:313,f:13,name:"Pierre Boulez",ep:"",s:"XXe siècle",el:1995,dc:2016,v:false,sec:"Musique",
+ wk:"Pierre_Boulez",dom:"Musique contemporaine",
+ desc:"Chef d'orchestre et compositeur, figure dominante de la musique contemporaine, fondateur de l'IRCAM au Centre Pompidou. Directeur musical du New York Philharmonic et de l'Orchestre de Bayreuth, il fit autorité pendant cinquante ans sur la vie musicale mondiale.",
+ oe:"Le Marteau sans maître (1955) · Pli selon pli (1960) · Répons · Dialogue de l'ombre double · IRCAM (fondé 1977)"},
+{ac:"beauxarts",id:314,f:14,name:"Jean-Jacques Annaud",ep:"",s:"XXIe siècle",el:2009,dc:null,v:true,sec:"Cinéma",
+ wk:"Jean-Jacques_Annaud",dom:"Cinéma",
+ desc:"Cinéaste français de réputation internationale, maître du film de grande époque et d'aventure. La Guerre du feu et Le Nom de la rose lui valurent une reconnaissance mondiale. Il a tourné dans 26 pays et sur tous les continents.",
+ oe:"La Guerre du feu (1981) · Le Nom de la rose (1986) · L'Ours (1988) · Sept ans au Tibet (1997) · Notre-Dame brûle (2022)"},
+{ac:"beauxarts",id:315,f:15,name:"Hugues Gall",ep:"",s:"XXIe siècle",el:2004,dc:null,v:true,sec:"Musique",
+ wk:"Hugues_Gall",dom:"Opéra · Direction artistique",
+ desc:"Directeur de l'Opéra de Genève (1980–1995) puis de l'Opéra national de Paris (1995–2004), il transforma l'Opéra Bastille en maison de niveau mondial. Secrétaire perpétuel de l'Académie des Beaux-Arts de 2012 à 2018.",
+ oe:"Direction de l'Opéra national de Paris (1995–2004) · Opéra de Genève (1980–1995)"},
+
+// ─── ⚖️ ACADÉMIE DES SCIENCES MORALES ET POLITIQUES (15) ────────
+
+{ac:"morales",id:401,f:null,name:"Alexis de Tocqueville",ep:"",s:"XIXe siècle",el:1838,dc:1859,v:false,sec:"Politique",
+ wk:"Alexis_de_Tocqueville",dom:"Philosophie politique · Histoire",
+ desc:"Élu à l'ASMP dès 1838, il en devint secrétaire perpétuel en 1852. Son analyse de la démocratie américaine et des révolutions demeure fondatrice pour la science politique mondiale. Membre aussi de l'Académie française (1841).",
+ oe:"De la démocratie en Amérique (2 vol., 1835–1840) · L'Ancien Régime et la Révolution (1856) · Souvenirs"},
+{ac:"morales",id:402,f:null,name:"Victor Cousin",ep:"le Père de l'éclectisme",s:"XIXe siècle",el:1832,dc:1867,v:false,sec:"Philosophie",
+ wk:"Victor_Cousin",dom:"Philosophie · Éducation",
+ desc:"Ministre de l'Instruction publique (1840), il réforma l'enseignement de la philosophie en France, créant le baccalauréat philosophique. Fondateur de l'école éclectique, il introduisit la philosophie allemande (Kant, Hegel) en France.",
+ oe:"Du vrai, du beau et du bien (1836) · Cours de l'histoire de la philosophie · Introduction à l'histoire de la philosophie"},
+{ac:"morales",id:403,f:null,name:"Adolphe Thiers",ep:"",s:"XIXe siècle",el:1833,dc:1877,v:false,sec:"Histoire",
+ wk:"Adolphe_Thiers",dom:"Histoire · Politique",
+ desc:"Premier président de la IIIe République (1871–1873), fondateur de la Banque de France moderne. Son Histoire de la Révolution française et de l'Empire napoléonien le rendirent célèbre. Il réprima la Commune de Paris en 1871.",
+ oe:"Histoire de la Révolution française (10 vol., 1823–1827) · Histoire du Consulat et de l'Empire (20 vol.)"},
+{ac:"morales",id:404,f:null,name:"Frédéric Le Play",ep:"le Père de la sociologie empirique",s:"XIXe siècle",el:1856,dc:1882,v:false,sec:"Économie",
+ wk:"Frédéric_Le_Play",dom:"Sociologie · Économie",
+ desc:"Fondateur de la sociologie empirique française, il réalisa des monographies détaillées de familles ouvrières dans toute l'Europe. Ingénieur des mines, commissaire général de l'Exposition universelle de 1855, il influença profondément la pensée sociale catholique.",
+ oe:"Les Ouvriers européens (6 vol., 1855–1879) · La Réforme sociale en France · La Constitution de l'Angleterre"},
+{ac:"morales",id:405,f:null,name:"Ernest Lavisse",ep:"l'Instituteur de la Nation",s:"XIXe siècle",el:1893,dc:1922,v:false,sec:"Histoire",
+ wk:"Ernest_Lavisse",dom:"Histoire · Éducation",
+ desc:"Directeur de l'École normale supérieure, son Histoire de France en 27 volumes forma des générations d'écoliers républicains. Son « Petit Lavisse », manuel scolaire utilisé jusqu'en 1914, fut un instrument majeur de construction de l'identité nationale.",
+ oe:"Histoire de France (27 vol., 1900–1911) · Études sur l'histoire de Prusse · Vue générale de l'histoire politique de l'Europe"},
+{ac:"morales",id:406,f:null,name:"Léon Bourgeois",ep:"",s:"XXe siècle",el:1905,dc:1925,v:false,sec:"Droit",
+ wk:"Léon_Bourgeois",dom:"Droit · Politique",
+ desc:"Prix Nobel de la paix 1920, président du Conseil (1895–1896), principal artisan de la Société des Nations dont il présida le premier Conseil en 1920. Défenseur du solidarisme, il inventa l'impôt sur le revenu progressif en France.",
+ oe:"Solidarité (1896) · Pacte de la Société des Nations (1919) · La Politique de la prévoyance sociale"},
+{ac:"morales",id:407,f:null,name:"Henri Bergson",ep:"le Philosophe de la durée",s:"XXe siècle",el:1901,dc:1941,v:false,sec:"Philosophie",
+ wk:"Henri_Bergson",dom:"Philosophie",
+ desc:"Prix Nobel de littérature 1927 pour son œuvre philosophique, il conçut une philosophie de la vie fondée sur la durée et l'élan vital, en rupture avec le mécanisme et le déterminisme. Ses conférences au Collège de France attiraient des foules qui bloquaient la circulation.",
+ oe:"Essai sur les données immédiates de la conscience (1889) · Matière et mémoire (1896) · L'Évolution créatrice (1907) · Le Rire"},
+{ac:"morales",id:408,f:null,name:"Raymond Aron",ep:"le Spectateur engagé",s:"XXe siècle",el:1963,dc:1983,v:false,sec:"Sociologie",
+ wk:"Raymond_Aron",dom:"Sociologie · Philosophie politique",
+ desc:"Penseur libéral, il maintint contre vents et marées (et contre Sartre) une pensée critique lucide face aux illusions totalitaires. Professeur à la Sorbonne et à l'ENA, éditorialiste du Figaro, il forma plusieurs générations d'esprits politiques français.",
+ oe:"L'Opium des intellectuels (1955) · Paix et guerre entre les nations (1962) · Les Étapes de la pensée sociologique · Mémoires"},
+{ac:"morales",id:409,f:null,name:"Claude Lévi-Strauss",ep:"le Père de l'anthropologie structurale",s:"XXe siècle",el:1973,dc:2009,v:false,sec:"Anthropologie",
+ wk:"Claude_Lévi-Strauss",dom:"Anthropologie · Ethnologie",
+ desc:"Fondateur du structuralisme anthropologique, professeur au Collège de France, ses travaux sur les mythes et les structures de la parenté révolutionnèrent les sciences humaines. Tristes Tropiques est considéré comme l'un des grands livres du XXe siècle.",
+ oe:"Les Structures élémentaires de la parenté (1949) · Tristes Tropiques (1955) · Mythologiques (4 vol.) · La Pensée sauvage"},
+{ac:"morales",id:410,f:null,name:"François Furet",ep:"",s:"XXe siècle",el:1990,dc:1997,v:false,sec:"Histoire",
+ wk:"François_Furet",dom:"Histoire · Révolution française",
+ desc:"Président de l'École des hautes études en sciences sociales, il renouvela radicalement l'interprétation de la Révolution française en rompant avec le paradigme marxiste. Son Dictionnaire critique de la Révolution française fit date.",
+ oe:"Penser la Révolution française (1978) · Le Passé d'une illusion (1995) · La Révolution en débat · Marx et la Révolution française"},
+{ac:"morales",id:411,f:null,name:"Michel Rocard",ep:"",s:"XXe siècle",el:2010,dc:2016,v:false,sec:"Économie politique",
+ wk:"Michel_Rocard",dom:"Économie · Politique",
+ desc:"Premier ministre de 1988 à 1991, inventeur du RMI et de la CSG, il incarna une social-démocratie réformiste et lucide. Sénateur et membre du Parlement européen, sa pensée économique influença la gauche française pendant quarante ans.",
+ oe:"À l'épreuve des faits · Si la gauche savait · Suicide de l'Occident, suicide de l'Europe ? · Le Cœur à l'ouvrage"},
+{ac:"morales",id:412,f:null,name:"Simone Veil",ep:"",s:"XXIe siècle",el:2008,dc:2017,v:false,sec:"Droit",
+ wk:"Simone_Veil",dom:"Droit · Politique",
+ desc:"Avocate, présidente du Conseil constitutionnel (2010–2013), membre également de l'Académie française. Sa trajectoire personnelle — d'Auschwitz au Panthéon — en fait l'une des figures morales les plus respectées de France.",
+ oe:"Une vie (mémoires, 2007) · Loi Veil sur l'IVG (1975) · Présidence du Parlement européen (1979)"},
+{ac:"morales",id:413,f:null,name:"Alain Minc",ep:"",s:"XXIe siècle",el:2007,dc:null,v:true,sec:"Économie",
+ wk:"Alain_Minc",dom:"Économie · Politique",
+ desc:"Essayiste et conseil d'entreprises, auteur prolifique sur les mutations du capitalisme, de la mondialisation et de la démocratie. Ancien président du conseil de surveillance du Monde, conseiller de nombreux chefs d'État et capitaines d'industrie.",
+ oe:"Le Nouveau Moyen Âge (1993) · La France de l'an 2000 · L'Argent fou · Une sorte de diable : Les vies de J. M. Keynes"},
+{ac:"morales",id:414,f:null,name:"Mireille Delmas-Marty",ep:"",s:"XXIe siècle",el:2007,dc:2022,v:false,sec:"Droit",
+ wk:"Mireille_Delmas-Marty",dom:"Droit pénal · Droit européen",
+ desc:"Professeur au Collège de France, pionnière du droit pénal comparé et du droit mondial, elle œuvra toute sa vie à la construction d'un ordre juridique international fondé sur les droits de l'homme.",
+ oe:"Le Flou du droit (1986) · Pour un droit commun (1994) · Trois défis pour un droit mondial · Libertés et sûreté dans un monde dangereux"},
+{ac:"morales",id:415,f:null,name:"Thierry de Montbrial",ep:"",s:"XXIe siècle",el:1992,dc:null,v:true,sec:"Économie internationale",
+ wk:"Thierry_de_Montbrial",dom:"Relations internationales · Géopolitique",
+ desc:"Fondateur de l'IFRI (Institut français des relations internationales) en 1979, il en reste le directeur général. Professeur à l'École polytechnique, il analyse chaque année dans son Ramses l'état du monde pour les décideurs politiques et économiques.",
+ oe:"L'Action et le Système du monde (2002) · Mémoire du temps présent · Ramses (annuel, depuis 1982)"},
+ {ac:"morales",id:416,f:null,name:"Bernard Arnault",ep:"",s:"XXIe siècle",el:2024,dc:null,v:true,sec:"Économie internationale",
+  wk:"Bernard_Arnault",dom:"Économie politique, Statistique et Finances",
+  desc:"Actionnaire majoritaire et président-directeur général du groupe de luxe LVMH - Moët Hennessy Louis Vuitton, il est par cette société, propriétaire des médias Les Échos, Le Parisien, Radio Classique et Paris Match.",
+oe:"Classé depuis 2019 avec sa famille parmi les plus grandes fortunes mondiales, il a occupé la première place du classement Forbes des milliardaires à plusieurs reprises entre décembre 2022 et mi-2024, en alternance avec Elon Musk."},
+];
+
+// ══════════════════════════════════════
+//  CONFIGURATION
+// ══════════════════════════════════════
+const SIECLE_COLORS = {
+  "XVIIe siècle": {bg:"rgba(122,64,18,0.15)",  border:"rgba(122,64,18,0.4)",  text:"#E8B87A"},
+  "XVIIIe siècle":{bg:"rgba(26,74,138,0.15)",  border:"rgba(26,74,138,0.4)",  text:"#7EB0E3"},
+  "XIXe siècle":  {bg:"rgba(26,107,80,0.15)",  border:"rgba(26,107,80,0.4)",  text:"#80E0C0"},
+  "XXe siècle":   {bg:"rgba(122,47,160,0.15)", border:"rgba(122,47,160,0.4)", text:"#D4A0F5"},
+  "XXIe siècle":  {bg:"rgba(155,28,28,0.15)",  border:"rgba(155,28,28,0.4)",  text:"#F5A0A0"},
+};
+
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+let activeAcad   = "francaise";
+let activeSiecle = "Tous";
+let searchQuery  = "";
+
+// ══════════════════════════════════════
+//  PORTRAIT (JSONP Wikipedia)
+// ══════════════════════════════════════
+const _imgCache = {};
+let _cbId = 0;
+function applyPortrait(wk, imgEl) {
+  if (!imgEl || !wk) return;
+  if (_imgCache[wk]) { imgEl.src = _imgCache[wk]; imgEl.onload = () => imgEl.classList.add("loaded"); return; }
+  const cb = "_wk" + (++_cbId);
+  const s = document.createElement("script");
+  let done = false;
+  const t = setTimeout(() => { if (!done) { done=true; cleanup(); } }, 8000);
+  function cleanup() { clearTimeout(t); delete window[cb]; if (s.parentNode) s.parentNode.removeChild(s); }
+  window[cb] = function(data) {
+    if (done) return; done=true; cleanup();
+    try {
+      const pages = data.query.pages;
+      const page  = pages[Object.keys(pages)[0]];
+      const url   = page.thumbnail && page.thumbnail.source;
+      if (url && imgEl) { _imgCache[wk]=url; imgEl.src=url; imgEl.onload=()=>imgEl.classList.add("loaded"); imgEl.onerror=()=>{imgEl.style.display="none";}; }
+    } catch(e) {}
+  };
+  s.onerror = function() { if (!done) { done=true; cleanup(); } };
+  s.src = "https://fr.wikipedia.org/w/api.php?action=query&prop=pageimages&pithumbsize=300&format=json&callback=" + cb + "&titles=" + encodeURIComponent(wk);
+  document.head.appendChild(s);
+}
+
+// ══════════════════════════════════════
+//  ONGLETS ACADÉMIES
+// ══════════════════════════════════════
+function buildAcadTabs() {
+  const c = document.getElementById("acadTabs");
+  c.innerHTML = "";
+  ACADEMIES_META.forEach(a => {
+    const btn = document.createElement("button");
+    const isActive = a.id === activeAcad;
+    btn.className = "acad-tab";
+    btn.style.cssText = isActive
+      ? `background:${a.bg};border-color:${a.border};color:${a.color};font-weight:600;`
+      : `background:rgba(255,255,255,0.04);border-color:rgba(201,153,58,0.2);color:rgba(232,240,250,0.6);`;
+    btn.innerHTML = a.emoji + " " + a.short;
+    btn.onclick = () => {
+      activeAcad = a.id; activeSiecle = "Tous"; searchQuery = "";
+      document.getElementById("searchInput").value = "";
+      buildAcadTabs(); buildFilters(); renderList();
+      const meta = ACADEMIES_META.find(x=>x.id===a.id);
+      document.getElementById("acadSubtitle").textContent = meta.name + " · " + meta.founded;
+    };
+    c.appendChild(btn);
+  });
+}
+
+// ══════════════════════════════════════
+//  FILTRES SIÈCLE
+// ══════════════════════════════════════
+function buildFilters() {
+  const membres = MEMBRES.filter(m => m.ac === activeAcad);
+  const siecles = ["Tous", ...new Set(membres.map(m => m.s))];
+  const c = document.getElementById("siecleFilters");
+  c.innerHTML = "";
+  siecles.forEach(s => {
+    const btn = document.createElement("button");
+    btn.className = "pill" + (s==="Tous"?" all":"") + (s===activeSiecle?" active":"");
+    if (s!=="Tous") btn.dataset.siecle = s;
+    btn.textContent = s;
+    btn.onclick = () => { activeSiecle = s; buildFilters(); renderList(); };
+    c.appendChild(btn);
+  });
+}
+
+// ══════════════════════════════════════
+//  RENDU LISTE
+// ══════════════════════════════════════
+function norm(s) { return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+
+function renderList() {
+  const list = document.getElementById("acadList");
+  const q = norm(searchQuery).trim();
+  const meta = ACADEMIES_META.find(a=>a.id===activeAcad);
+
+  const filtered = MEMBRES.filter(m => {
+    if (m.ac !== activeAcad) return false;
+    if (activeSiecle !== "Tous" && m.s !== activeSiecle) return false;
+    if (q) return norm(m.name + " " + m.ep + " " + m.dom + " " + (m.sec||"")).includes(q);
+    return true;
+  });
+
+  const total = MEMBRES.filter(m=>m.ac===activeAcad).length;
+  document.getElementById("countBar").textContent =
+    filtered.length === total
+      ? `${total} membres · ${meta.name}`
+      : `${filtered.length} résultat${filtered.length>1?"s":""}`;
+
+  list.innerHTML = "";
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty"><span>${meta.emoji}</span>Aucun membre trouvé</div>`;
+    return;
+  }
+
+  const showGroups = activeSiecle === "Tous" && !q;
+  if (showGroups) {
+    const groups = {};
+    filtered.forEach(m => { if (!groups[m.s]) groups[m.s]=[]; groups[m.s].push(m); });
+    Object.entries(groups).forEach(([siecle, mbs]) => {
+      const sec = document.createElement("div");
+      sec.className = "siecle-section";
+      sec.innerHTML = `<div class="siecle-header"><div class="siecle-line"></div><span class="siecle-label">${siecle}</span><div class="siecle-line"></div></div>`;
+      mbs.forEach((m,i) => sec.appendChild(buildCard(m,i)));
+      list.appendChild(sec);
+    });
+  } else {
+    filtered.forEach((m,i) => list.appendChild(buildCard(m,i)));
+  }
+}
+
+function getEmoji(ac) {
+  const m = ACADEMIES_META.find(a=>a.id===ac);
+  return m ? m.emoji : "🏛";
+}
+
+function buildCard(m, idx) {
+  const card = document.createElement("div");
+  card.className = "acad-card";
+  card.dataset.siecle = m.s;
+  card.style.animationDelay = (idx * 0.03) + "s";
+  const endLabel = m.v ? "en poste" : (m.dc || "—");
+  const numLabel = m.f ? `Fauteuil ${m.f}` : (m.sec || m.dom.split("·")[0].trim());
+
+  card.innerHTML = `
+    <div class="portrait-wrap">
+      <div class="portrait-placeholder">${getEmoji(m.ac)}</div>
+      <img alt="${m.name}">
+    </div>
+    <div class="acad-info">
+      <div class="acad-num">${numLabel}</div>
+      <div class="acad-name">${m.name}</div>
+      ${m.ep ? `<div class="acad-epithet">${m.ep}</div>` : ""}
+      <div class="acad-dates"><span>${m.el} – ${endLabel}</span></div>
+    </div>
+    <div class="acad-arrow">›</div>`;
+
+  applyPortrait(m.wk, card.querySelector("img"));
+  card.onclick = () => openModal(m);
+  return card;
+}
+
+// ══════════════════════════════════════
+//  MODAL
+// ══════════════════════════════════════
+function openModal(m) {
+  const dc = SIECLE_COLORS[m.s] || SIECLE_COLORS["XXIe siècle"];
+  const endLabel = m.v ? "En poste" : (m.dc || "—");
+  const meta = ACADEMIES_META.find(a=>a.id===m.ac);
+
+  document.getElementById("modalContent").innerHTML = `
+    <div class="modal-portrait-wrap">
+      <div class="modal-portrait-placeholder">${meta.emoji}</div>
+      <img id="mImg" alt="${m.name}">
+    </div>
+    <div class="modal-body">
+      <div style="margin-top:10px">
+        <span class="modal-siecle-badge" style="background:${dc.bg};border-color:${dc.border};color:${dc.text};">${m.s}</span>
+        <span class="modal-acad-badge">${meta.emoji} ${meta.short}</span>
+      </div>
+      <div class="modal-name">${m.name}</div>
+      ${m.ep ? `<div class="modal-epithet">${m.ep}</div>` : `<div style="margin-bottom:14px"></div>`}
+      <div class="modal-stats">
+        <div class="stat-box"><div class="stat-label">Élu(e) en</div><div class="stat-value">${m.el}</div></div>
+        <div class="stat-box"><div class="stat-label">${m.f?"Fauteuil":"Section"}</div><div class="stat-value">${m.f?"N° "+m.f:(m.sec||"—")}</div></div>
+        <div class="stat-box"><div class="stat-label">${m.v?"Statut":"Décès"}</div><div class="stat-value">${endLabel}</div></div>
+        <div class="stat-box"><div class="stat-label">Domaine</div><div class="stat-value" style="font-size:12px;line-height:1.4">${m.dom||"—"}</div></div>
+      </div>
+      ${m.desc ? `<p class="modal-desc">${m.desc}</p>` : ""}
+      ${m.oe ? `<div class="stat-box" style="margin-bottom:16px"><div class="stat-label">Œuvres majeures</div><div class="stat-value" style="font-size:13px;line-height:1.6">${m.oe}</div></div>` : ""}
+      <button class="modal-close" onclick="closeModal()">${meta.emoji} Fermer ${meta.emoji}</button>
+    </div>`;
+
+  applyPortrait(m.wk, document.getElementById("mImg"));
+  document.getElementById("modalBackdrop").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById("modalBackdrop")) return;
+  document.getElementById("modalBackdrop").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+// ══════════════════════════════════════
+//  SETTINGS
+// ══════════════════════════════════════
+function openSettings() { document.getElementById("settingsBackdrop").classList.add("open"); document.body.style.overflow="hidden"; }
+function closeSettings(e) {
+  if (e && e.target !== document.getElementById("settingsBackdrop")) return;
+  document.getElementById("settingsBackdrop").classList.remove("open");
+  document.body.style.overflow="";
+}
+function openAppStore(appId) { window.location.href = `https://apps.apple.com/fr/app/${appId}`; }
+
+document.getElementById("searchInput").addEventListener("input", function() {
+  searchQuery = this.value; renderList();
+});
+
+// ══════════════════════════════════════
+//  QUIZ
+// ══════════════════════════════════════
+const QUIZ_TOTAL = 8;
+let quizQuestions = [], quizIdx = 0, quizScore = 0, quizAnswered = false;
+
+const QUIZ_TYPES = ["portrait","domaine","annee","epithet"];
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function buildQuizQuestions() {
+  const pool = MEMBRES.filter(m => m.ac === activeAcad);
+  const selected = shuffle(pool).slice(0, QUIZ_TOTAL);
+  return selected.map(m => {
+    const type = QUIZ_TYPES[Math.floor(Math.random() * QUIZ_TYPES.length)];
+    // Choisir type valide
+    const validType = (type === "epithet" && !m.ep) ? "domaine" : type;
+    const wrongs = shuffle(pool.filter(x => x.id !== m.id)).slice(0, 3);
+    const choices = shuffle([m, ...wrongs]);
+    return { m, type: validType, choices };
+  });
+}
+
+function openQuiz() {
+  quizQuestions = buildQuizQuestions();
+  quizIdx = 0; quizScore = 0;
+  document.getElementById("quizBackdrop").classList.add("open");
+  document.body.style.overflow = "hidden";
+  renderQuizQuestion();
+}
+function closeQuiz() {
+  document.getElementById("quizBackdrop").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function renderQuizQuestion() {
+  const c = document.getElementById("quizContent");
+  if (quizIdx >= quizQuestions.length) { renderQuizScore(); return; }
+  const { m, type, choices } = quizQuestions[quizIdx];
+  quizAnswered = false;
+  const pct = (quizIdx / QUIZ_TOTAL * 100).toFixed(0);
+  const meta = ACADEMIES_META.find(a => a.id === activeAcad);
+
+  let question = "", hint = "", choiceLabel = (x) => x.name;
+
+  if (type === "portrait") {
+    question = "Qui est ce membre de l'académie ?";
+    hint = "";
+  } else if (type === "domaine") {
+    question = `Quel membre est spécialiste de&nbsp;: <em>${m.dom}</em> ?`;
+    hint = m.s;
+  } else if (type === "annee") {
+    question = `Qui a été élu(e) en <strong>${m.el}</strong> ?`;
+    hint = m.s;
+  } else if (type === "epithet") {
+    question = `Qui est surnommé(e) <em>« ${m.ep} »</em> ?`;
+    hint = m.s;
+  }
+
+  c.innerHTML = `
+    <div class="quiz-progress">Question ${quizIdx + 1} / ${QUIZ_TOTAL} &nbsp;·&nbsp; ${quizScore} bonne${quizScore>1?"s":""}</div>
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
+    ${type === "portrait" ? `
+    <div class="quiz-portrait">
+      <div class="quiz-portrait-ph">${meta.emoji}</div>
+      <img id="qImg" alt="">
+    </div>` : ""}
+    <div class="quiz-question">${question}</div>
+    ${hint ? `<div class="quiz-hint">${hint}</div>` : ""}
+    <div class="quiz-choices" id="quizChoices">
+      ${choices.map(x => `<button class="quiz-choice" onclick="answerQuiz('${x.id}','${m.id}')">${choiceLabel(x)}</button>`).join("")}
+    </div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <button class="quiz-next" id="quizNext" onclick="nextQuizQuestion()">
+      ${quizIdx + 1 < QUIZ_TOTAL ? "Question suivante →" : "Voir mon score 🏆"}
+    </button>
+    <button class="quiz-close-btn" style="margin-top:8px" onclick="closeQuiz()">Fermer</button>`;
+
+  if (type === "portrait") {
+    const img = document.getElementById("qImg");
+    applyPortrait(m.wk, img);
+  }
+}
+
+function answerQuiz(chosenId, correctId) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const correct = String(chosenId) === String(correctId);
+  if (correct) quizScore++;
+
+  const btns = document.querySelectorAll(".quiz-choice");
+  btns.forEach(btn => {
+    btn.onclick = null;
+    const id = btn.getAttribute("onclick")?.match(/'(\d+)'/)?.[1];
+    // reconstruct — use dataset instead via re-render
+  });
+
+  // Colorier les boutons
+  document.querySelectorAll(".quiz-choice").forEach(btn => {
+    const match = btn.textContent;
+    const { m: correctM } = quizQuestions[quizIdx];
+    if (btn.textContent === correctM.name) {
+      btn.classList.add(correct && match === correctM.name ? "correct" : "reveal");
+    } else if (!correct && btn.classList.length === 1) {
+      btn.classList.add("wrong");
+    }
+    btn.onclick = null;
+  });
+
+  const fb = document.getElementById("quizFeedback");
+  fb.textContent = correct ? "✓ Bravo !" : `✗ C'était : ${quizQuestions[quizIdx].m.name}`;
+  fb.style.color = correct ? "#80E0C0" : "#F5A0A0";
+  document.getElementById("quizNext").style.display = "block";
+}
+
+function nextQuizQuestion() {
+  quizIdx++;
+  renderQuizQuestion();
+}
+
+function renderQuizScore() {
+  const meta = ACADEMIES_META.find(a => a.id === activeAcad);
+  const pct = Math.round(quizScore / QUIZ_TOTAL * 100);
+  const msg = pct === 100 ? "Parfait ! Vous êtes un expert !" :
+              pct >= 75  ? "Très bien ! Excellente culture !" :
+              pct >= 50  ? "Pas mal ! Continuez à explorer." :
+              "À revoir… Consultez les fiches !";
+  document.getElementById("quizContent").innerHTML = `
+    <div class="quiz-score">
+      <div style="font-size:36px;margin-bottom:12px">${meta.emoji}</div>
+      <div class="quiz-score-num">${quizScore}<span style="font-size:24px;color:rgba(201,153,58,0.5)"> / ${QUIZ_TOTAL}</span></div>
+      <div class="quiz-score-label">${msg}</div>
+      <button class="quiz-close-btn" style="margin-bottom:10px" onclick="openQuiz()">🔄 Rejouer</button>
+      <button class="quiz-close-btn" onclick="closeQuiz()">Fermer</button>
+    </div>`;
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+const firstMeta = ACADEMIES_META[0];
+document.getElementById("acadSubtitle").textContent = firstMeta.name + " · " + firstMeta.founded;
+buildAcadTabs();
+buildFilters();
+renderList();
+</script>
+</body>
+</html>
